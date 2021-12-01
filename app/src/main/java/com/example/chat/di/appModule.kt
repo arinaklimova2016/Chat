@@ -19,13 +19,13 @@ val appModule = module {
 
     viewModel {
         UsersViewModel(
-
+            tcp = get()
         )
     }
 
     viewModel {
         ChatViewModel(
-
+            tcp = get()
         )
     }
 

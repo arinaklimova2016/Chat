@@ -4,6 +4,7 @@ import com.example.chat.constants.Constants.TCP_PORT
 import com.example.chat.model.*
 import com.google.gson.Gson
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.MutableSharedFlow
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
@@ -19,7 +20,7 @@ class TcpClient {
     private lateinit var gson: Gson
     private lateinit var id: String
     private var timer: Job? = null
-    lateinit var usersList: UsersReceivedDto
+    val usersList = MutableSharedFlow<UsersReceivedDto>()
     lateinit var newMessage: MessageDto
 
     private val job = SupervisorJob()
@@ -50,21 +51,18 @@ class TcpClient {
         scope.launch {
             while (socket.isConnected) {
                 delay(5000)
-                val pingDto = gson.toJson(PingDto(id))
-                val pingDtoJson = gson.toJson(BaseDto(BaseDto.Action.PING, pingDto))
+                val pingDto = gson.toJson(BaseDto(BaseDto.Action.PING, gson.toJson(PingDto(id))))
                 try {
-                    writer.println(pingDtoJson)
+                    writer.println(pingDto)
                     writer.flush()
                     timer = scope.launch {
                         delay(5000)
-                        socket.close()
+                        close()
                     }
                     pong()
                 }catch (e:Exception){e.printStackTrace()}
-
             }
         }
-
     }
 
     private fun pong() {
@@ -74,19 +72,33 @@ class TcpClient {
                 BaseDto.Action.PONG -> {
                     delay(4000)
                     timer?.cancel()
-
                 }
                 BaseDto.Action.USERS_RECEIVED -> {
-                    usersList = gson.fromJson(baseDto.payload, UsersReceivedDto::class.java)
+                    usersList.emit(gson.fromJson(baseDto.payload, UsersReceivedDto::class.java))
                 }
                 BaseDto.Action.NEW_MESSAGE -> {
                     newMessage = gson.fromJson(baseDto.payload, MessageDto::class.java)
                 }
                 else -> {
-                    socket.close()
+                    close()
                 }
             }
         }
+    }
+
+    fun getUsers(){
+        scope.launch {
+            val getUsers = gson.toJson(BaseDto(BaseDto.Action.GET_USERS, gson.toJson(GetUsersDto(id))))
+            writer.println(getUsers)
+            writer.flush()
+            pong()
+        }
+    }
+
+    private fun close(){
+        writer.close()
+        reader.close()
+        socket.close()
     }
 
 }

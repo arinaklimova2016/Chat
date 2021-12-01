@@ -9,12 +9,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.chat.R
 import com.example.chat.chat.ChatFragment
 import com.example.chat.databinding.FragmentUsersBinding
-import com.example.chat.server.TcpClient
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class UsersFragment : Fragment() {
 
-    private val tcp = TcpClient()
     private lateinit var binding: FragmentUsersBinding
 
     private val model by viewModel<UsersViewModel>()
@@ -40,6 +38,8 @@ class UsersFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         bindingRecycler()
+        model.getUsers()
+        adapter.submitList(model.users)
     }
 
     private fun bindingRecycler() {
