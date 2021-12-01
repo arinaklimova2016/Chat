@@ -1,4 +1,6 @@
 package com.example.chat.chat
 
-class ChatViewModel {
+import androidx.lifecycle.ViewModel
+
+class ChatViewModel : ViewModel() {
 }

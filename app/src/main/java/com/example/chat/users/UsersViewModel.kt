@@ -1,4 +1,7 @@
 package com.example.chat.users
 
-class UsersViewModel {
+import androidx.lifecycle.ViewModel
+
+
+class UsersViewModel : ViewModel() {
 }

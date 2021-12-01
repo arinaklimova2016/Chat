@@ -1,30 +1,28 @@
 package com.example.chat.login
 
 import androidx.lifecycle.ViewModel
-import com.example.chat.server.Udp
-import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.schedulers.Schedulers
+import com.example.chat.server.TcpClient
+import com.example.chat.server.UdpClient
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 
 class LoginViewModel(
-    private val udp: Udp
+    private val udp: UdpClient,
+    private val tcp: TcpClient
 ) : ViewModel() {
 
-    private val disposables = CompositeDisposable()
+    private val job by lazy { SupervisorJob() }
+    private val scope by lazy {
+        CoroutineScope(job + Dispatchers.IO)
+    }
 
-    fun getIp() {
-        disposables.add(udp.getServerIp()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(
-                {
-
-                }, {
-                    printStackTrace()
-                }
-            )
-        )
+    fun getIp(name: String) {
+        scope.launch{
+            val ip = udp.getServerIp()
+            tcp.createSocket(ip, name)
+        }
     }
 
 }

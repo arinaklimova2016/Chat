@@ -5,9 +5,7 @@ import android.os.Bundle
 import com.example.chat.R
 import com.example.chat.databinding.ActivityMainBinding
 import com.example.chat.login.LoginFragment
-import dagger.hilt.android.AndroidEntryPoint
 
-@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
