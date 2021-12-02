@@ -9,7 +9,6 @@ import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
 import java.io.PrintWriter
-import java.lang.Exception
 import java.net.Socket
 
 class TcpClient {
@@ -17,12 +16,11 @@ class TcpClient {
     private lateinit var socket: Socket
     private lateinit var reader: BufferedReader
     private lateinit var writer: PrintWriter
-    private lateinit var gson: Gson
+    private var gson = Gson()
     private lateinit var id: String
     private var timer: Job? = null
     val usersList = MutableSharedFlow<UsersReceivedDto>()
-    lateinit var newMessage: MessageDto
-
+    val newMessage = MutableSharedFlow<MessageDto>()
     private val job = SupervisorJob()
     private val scope = CoroutineScope(Dispatchers.IO + job)
 
@@ -34,7 +32,7 @@ class TcpClient {
         writer = PrintWriter(OutputStreamWriter(socket.getOutputStream()))
         gson = Gson()
         val baseDto = gson.fromJson(reader.readLine(), BaseDto::class.java)
-        val connectedDto = gson.fromJson(baseDto.payload, ConnectedDto::class.java)
+        val connectedDto = gson.fromJson(baseDto?.payload, ConnectedDto::class.java)
         val connectDto = gson.toJson(ConnectDto(connectedDto.id, name))
 
         id = connectedDto.id
@@ -60,42 +58,63 @@ class TcpClient {
                         close()
                     }
                     pong()
-                }catch (e:Exception){e.printStackTrace()}
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
             }
         }
     }
 
     private fun pong() {
         scope.launch {
-            val baseDto = gson.fromJson(reader.readLine(), BaseDto::class.java)
-            when (baseDto.action) {
-                BaseDto.Action.PONG -> {
-                    delay(4000)
-                    timer?.cancel()
-                }
-                BaseDto.Action.USERS_RECEIVED -> {
-                    usersList.emit(gson.fromJson(baseDto.payload, UsersReceivedDto::class.java))
-                }
-                BaseDto.Action.NEW_MESSAGE -> {
-                    newMessage = gson.fromJson(baseDto.payload, MessageDto::class.java)
-                }
-                else -> {
-                    close()
+            while (socket.isConnected){
+                val baseDto = gson.fromJson(reader.readLine(), BaseDto::class.java)
+                when (baseDto.action) {
+                    BaseDto.Action.PONG -> {
+                        delay(4000)
+                        timer?.cancel()
+                    }
+                    BaseDto.Action.USERS_RECEIVED -> {
+                        usersList.emit(gson.fromJson(baseDto.payload, UsersReceivedDto::class.java))
+                    }
+                    BaseDto.Action.NEW_MESSAGE -> {
+                        newMessage.emit(gson.fromJson(baseDto.payload, MessageDto::class.java))
+                    }
+                    else -> {
+                        close()
+                    }
                 }
             }
         }
     }
 
-    fun getUsers(){
+    fun getUsers() {
         scope.launch {
-            val getUsers = gson.toJson(BaseDto(BaseDto.Action.GET_USERS, gson.toJson(GetUsersDto(id))))
-            writer.println(getUsers)
-            writer.flush()
-            pong()
+            while (socket.isConnected) {
+                val getUsers =
+                    gson.toJson(BaseDto(BaseDto.Action.GET_USERS, gson.toJson(GetUsersDto(id))))
+                writer.println(getUsers)
+                writer.flush()
+                pong()
+
+            }
         }
     }
 
-    private fun close(){
+    fun sendMessage(receiver: String, message: String) {
+        scope.launch {
+            val sendMessage = gson.toJson(
+                BaseDto(
+                    BaseDto.Action.SEND_MESSAGE,
+                    gson.toJson(SendMessageDto(id, receiver, message))
+                )
+            )
+            writer.println(sendMessage)
+            writer.flush()
+        }
+    }
+
+    private fun close() {
         writer.close()
         reader.close()
         socket.close()

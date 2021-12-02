@@ -1,11 +1,10 @@
-package com.example.chat.users
+package com.example.chat.ui.users
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.chat.R
 import com.example.chat.databinding.UserLayoutBinding
 import com.example.chat.model.User
 import com.example.chat.model.UsersReceivedDto
@@ -31,9 +30,7 @@ class UsersAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(user: User, onClick: (User) -> Unit) {
-            binding.user.text = binding.root.context.getString(
-                R.string.email
-            )
+            binding.user.text = user.name
             binding.root.setOnClickListener {
                 onClick(user)
             }

@@ -4,7 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.example.chat.R
 import com.example.chat.databinding.ActivityMainBinding
-import com.example.chat.login.LoginFragment
+import com.example.chat.ui.login.LoginFragment
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

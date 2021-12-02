@@ -1,4 +1,4 @@
-package com.example.chat.users
+package com.example.chat.ui.users
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,8 +7,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.chat.R
-import com.example.chat.chat.ChatFragment
+import com.example.chat.ui.chat.ChatFragment
 import com.example.chat.databinding.FragmentUsersBinding
+import com.example.chat.model.User
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class UsersFragment : Fragment() {
@@ -20,7 +21,7 @@ class UsersFragment : Fragment() {
     private val adapter by lazy {
         UsersAdapter(
             onUsersClicked = {
-                onUsersClicked()
+                onUsersClicked(it)
             }
         )
     }
@@ -38,8 +39,8 @@ class UsersFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         bindingRecycler()
+        observeToViewModel()
         model.getUsers()
-        adapter.submitList(model.users)
     }
 
     private fun bindingRecycler() {
@@ -47,8 +48,10 @@ class UsersFragment : Fragment() {
         binding.recycler.adapter = adapter
     }
 
-    private fun onUsersClicked() {
-        val fragment = ChatFragment()
+    private fun onUsersClicked(user: User) {
+        val userName = user.name
+        val userId = user.id
+        val fragment = ChatFragment.newInstance(userName, userId)
         val fragmentTransaction = activity?.supportFragmentManager?.beginTransaction()
         fragmentTransaction?.replace(
             R.id.fragment_container,
@@ -56,6 +59,14 @@ class UsersFragment : Fragment() {
         )
             ?.addToBackStack("")
             ?.commit()
+    }
+
+    private fun observeToViewModel() {
+
+        model.users.observe(viewLifecycleOwner, { t ->
+            adapter.submitList(t ?: listOf())
+        })
+
     }
 
 }

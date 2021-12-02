@@ -1,4 +1,4 @@
-package com.example.chat.login
+package com.example.chat.ui.login
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -6,16 +6,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ProgressBar
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import com.example.chat.R
 import com.example.chat.databinding.FragmentLoginBinding
-import com.example.chat.server.TcpClient
-import com.example.chat.users.UsersFragment
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
+import com.example.chat.ui.users.UsersFragment
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class LoginFragment : Fragment() {
@@ -25,6 +21,7 @@ class LoginFragment : Fragment() {
     private val model by viewModel<LoginViewModel>()
     private lateinit var btnLogIn: Button
     private lateinit var editEmail: EditText
+    private lateinit var progressBar: ProgressBar
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -40,12 +37,14 @@ class LoginFragment : Fragment() {
 
         btnLogIn = binding.logIn
         editEmail = binding.editEmail
+        progressBar = binding.progressBar
 
 
         btnLogIn.setOnClickListener {
+            progressBar.visibility = ProgressBar.VISIBLE
             val name: String = editEmail.text.toString()
+            observeToViewModel()
             model.getIp(name)
-            createFragment()
         }
     }
 
@@ -58,6 +57,13 @@ class LoginFragment : Fragment() {
         )
             ?.addToBackStack("")
             ?.commit()
+    }
+
+    private fun observeToViewModel() {
+        model.idSingleLiveEvent.observe(this, Observer {
+            println(it)
+            createFragment()
+        })
     }
 
 }

@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F5DCC9"
-    tools:context=".login.LoginFragment">
+    tools:context=".ui.login.LoginFragment">
 
     <ImageView
         android:id="@+id/icon"
@@ -38,5 +38,17 @@
         android:background="@drawable/btn_background"
         android:text="@string/log_in"
         android:textColor="@color/white" />
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/log_in"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="20dip"
+        android:layout_marginTop="15dp"
+        android:indeterminateDrawable="@drawable/spinner_ring"
+        android:indeterminateOnly="true"
+        android:visibility="gone" />
 
 </RelativeLayout>

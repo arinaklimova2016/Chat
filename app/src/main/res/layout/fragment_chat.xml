@@ -4,32 +4,44 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F5DCC9"
-    tools:context=".chat.ChatFragment">
+    tools:context=".ui.chat.ChatFragment">
+
+    <TextView
+        android:id="@+id/username"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:background="#FB8C4B"
+        android:gravity="center"
+        android:textColor="#7A1F00"
+        android:textSize="17sp"
+        android:textStyle="bold"
+        tools:text="here username" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_messages"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true" />
+        android:layout_below="@+id/username" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:orientation="horizontal"
-        android:layout_marginBottom="5dp"
         android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:orientation="horizontal"
         android:weightSum="100">
 
         <EditText
             android:id="@+id/edit_message"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:layout_weight="70"
             android:layout_marginStart="5dp"
-            android:paddingStart="7dp"
+            android:layout_weight="70"
             android:background="@drawable/edit_background"
             android:hint="@string/enter_your_message"
+            android:paddingStart="7dp"
             android:textSize="12sp" />
 
         <ImageView
@@ -40,7 +52,6 @@
             android:src="@drawable/send_icon" />
 
     </LinearLayout>
-
 
 
 </RelativeLayout>

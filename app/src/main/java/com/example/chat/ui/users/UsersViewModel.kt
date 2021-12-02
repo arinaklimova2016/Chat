@@ -1,5 +1,7 @@
-package com.example.chat.users
+package com.example.chat.ui.users
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.chat.model.User
 import com.example.chat.server.TcpClient
@@ -16,11 +18,12 @@ class UsersViewModel(
     private val job = SupervisorJob()
     private val scope = CoroutineScope(job + Dispatchers.Main)
 
-    lateinit var users: List<User>
+    private val _users: MutableLiveData<List<User>> = MutableLiveData()
+    val users: LiveData<List<User>> = _users
 
     init {
-        getUsers()
         observer()
+        getUsers()
     }
 
     fun getUsers() {
@@ -30,7 +33,7 @@ class UsersViewModel(
     private fun observer() {
         scope.launch {
             tcp.usersList.collect {
-                users = it.users
+                _users.value = it.users
             }
         }
     }
