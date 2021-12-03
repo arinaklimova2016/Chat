@@ -49,9 +49,7 @@ class UsersFragment : Fragment() {
     }
 
     private fun onUsersClicked(user: User) {
-        val userName = user.name
-        val userId = user.id
-        val fragment = ChatFragment.newInstance(userName, userId)
+        val fragment = ChatFragment.newInstance(user)
         val fragmentTransaction = activity?.supportFragmentManager?.beginTransaction()
         fragmentTransaction?.replace(
             R.id.fragment_container,

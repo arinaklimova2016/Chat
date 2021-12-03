@@ -17,7 +17,7 @@ class TcpClient {
     private lateinit var reader: BufferedReader
     private lateinit var writer: PrintWriter
     private var gson = Gson()
-    private lateinit var id: String
+    lateinit var you: User
     private var timer: Job? = null
     val usersList = MutableSharedFlow<UsersReceivedDto>()
     val newMessage = MutableSharedFlow<MessageDto>()
@@ -35,7 +35,7 @@ class TcpClient {
         val connectedDto = gson.fromJson(baseDto?.payload, ConnectedDto::class.java)
         val connectDto = gson.toJson(ConnectDto(connectedDto.id, name))
 
-        id = connectedDto.id
+        you = User(connectedDto.id, name)
 
         val baseDtoJson = gson.toJson(BaseDto(BaseDto.Action.CONNECT, connectDto))
 
@@ -49,7 +49,8 @@ class TcpClient {
         scope.launch {
             while (socket.isConnected) {
                 delay(5000)
-                val pingDto = gson.toJson(BaseDto(BaseDto.Action.PING, gson.toJson(PingDto(id))))
+                val pingDto =
+                    gson.toJson(BaseDto(BaseDto.Action.PING, gson.toJson(PingDto(you.id))))
                 try {
                     writer.println(pingDto)
                     writer.flush()
@@ -67,7 +68,7 @@ class TcpClient {
 
     private fun pong() {
         scope.launch {
-            while (socket.isConnected){
+            while (socket.isConnected) {
                 val baseDto = gson.fromJson(reader.readLine(), BaseDto::class.java)
                 when (baseDto.action) {
                     BaseDto.Action.PONG -> {
@@ -88,30 +89,22 @@ class TcpClient {
         }
     }
 
-    fun getUsers() {
-        scope.launch {
-            while (socket.isConnected) {
-                val getUsers =
-                    gson.toJson(BaseDto(BaseDto.Action.GET_USERS, gson.toJson(GetUsersDto(id))))
-                writer.println(getUsers)
-                writer.flush()
-                pong()
-
-            }
-        }
+    suspend fun getUsers() {
+        val getUsers =
+            gson.toJson(BaseDto(BaseDto.Action.GET_USERS, gson.toJson(GetUsersDto(you.id))))
+        writer.println(getUsers)
+        writer.flush()
     }
 
-    fun sendMessage(receiver: String, message: String) {
-        scope.launch {
-            val sendMessage = gson.toJson(
-                BaseDto(
-                    BaseDto.Action.SEND_MESSAGE,
-                    gson.toJson(SendMessageDto(id, receiver, message))
-                )
+    suspend fun sendMessage(receiver: String, message: String) {
+        val sendMessage = gson.toJson(
+            BaseDto(
+                BaseDto.Action.SEND_MESSAGE,
+                gson.toJson(SendMessageDto(you.id, receiver, message))
             )
-            writer.println(sendMessage)
-            writer.flush()
-        }
+        )
+        writer.println(sendMessage)
+        writer.flush()
     }
 
     private fun close() {

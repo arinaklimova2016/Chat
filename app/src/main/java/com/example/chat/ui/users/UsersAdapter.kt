@@ -7,13 +7,12 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.chat.databinding.UserLayoutBinding
 import com.example.chat.model.User
-import com.example.chat.model.UsersReceivedDto
 
 class UsersAdapter(
     private val onUsersClicked: (User) -> Unit
 ) : ListAdapter<User, UsersAdapter.MyViewHolder>(DiffCallback()) {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UsersAdapter.MyViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
         val binding = UserLayoutBinding.inflate(
             LayoutInflater.from(parent.context),
             parent,
@@ -22,7 +21,7 @@ class UsersAdapter(
         return MyViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: UsersAdapter.MyViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         holder.bind(currentList[position], onUsersClicked)
     }
 

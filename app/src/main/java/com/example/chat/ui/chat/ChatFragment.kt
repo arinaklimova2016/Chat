@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.chat.constants.Constants.USERID
 import com.example.chat.constants.Constants.USERNAME
 import com.example.chat.databinding.FragmentChatBinding
+import com.example.chat.model.User
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class ChatFragment : Fragment() {
@@ -19,23 +20,24 @@ class ChatFragment : Fragment() {
     private lateinit var binding: FragmentChatBinding
     private val model by viewModel<ChatViewModel>()
 
-    private val itemUserName by lazy {
-        requireArguments().getString(USERNAME)
-    }
-
-    private val itemUserId by lazy {
-        requireArguments().getString(USERID)
+    private val itemUser: User by lazy {
+        User(
+            requireArguments().getString(USERID)!!,
+            requireArguments().getString(USERNAME)!!
+        )
     }
 
     private val adapter by lazy {
         ChatAdapter(
-
+            message = model.message,
+            receiver = itemUser,
+            you = model.getYou()
         )
     }
 
-    private val txtView: TextView = binding.username
-    private val editText: EditText = binding.editMessage
-    private val btnSend: ImageView = binding.btnSendMessage
+    private lateinit var txtView: TextView
+    private lateinit var editText: EditText
+    private lateinit var btnSend: ImageView
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -51,11 +53,15 @@ class ChatFragment : Fragment() {
 
         bindingRecycler()
 
-        txtView.text = itemUserName
+        txtView = binding.username
+        editText = binding.editMessage
+        btnSend = binding.btnSendMessage
 
+        txtView.text = itemUser.name
         btnSend.setOnClickListener{
             val message: String = editText.text.toString()
-            model.sendMessage(itemUserId!!, message)
+            model.sendMessage(itemUser, message)
+            editText.text.clear()
         }
 
         observeToViewModel()
@@ -74,17 +80,15 @@ class ChatFragment : Fragment() {
     }
 
     companion object {
-
         @JvmStatic
-        fun newInstance(user: String, userId: String): ChatFragment {
+        fun newInstance(receiver: User): ChatFragment {
             return ChatFragment().apply {
                 arguments = Bundle().apply {
-                    putString(USERNAME, user)
-                    putString(USERID, userId)
+                    putString(USERNAME, receiver.name)
+                    putString(USERID, receiver.id)
                 }
             }
         }
-
     }
 
 }

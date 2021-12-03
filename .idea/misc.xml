@@ -9,10 +9,11 @@
         <entry key="app/src/main/res/drawable/send_message.xml" value="0.6072916666666667" />
         <entry key="app/src/main/res/drawable/spinner_ring.xml" value="0.371875" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.5770833333333333" />
-        <entry key="app/src/main/res/layout/fragment_chat.xml" value="0.5911458333333334" />
+        <entry key="app/src/main/res/layout/fragment_chat.xml" value="0.5517241379310345" />
         <entry key="app/src/main/res/layout/fragment_login.xml" value="0.5911458333333334" />
         <entry key="app/src/main/res/layout/fragment_users.xml" value="0.542319749216301" />
         <entry key="app/src/main/res/layout/receive_layout.xml" value="0.5911458333333334" />
+        <entry key="app/src/main/res/layout/receive_message.xml" value="0.5911458333333334" />
         <entry key="app/src/main/res/layout/send_message.xml" value="0.5911458333333334" />
         <entry key="app/src/main/res/layout/user_layout.xml" value="0.5911458333333334" />
         <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.6072916666666667" />

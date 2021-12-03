@@ -3,14 +3,12 @@ package com.example.chat.ui.chat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.chat.model.MessageDto
 import com.example.chat.model.User
 import com.example.chat.server.TcpClient
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
 
 class ChatViewModel(
     private val tcp: TcpClient
@@ -26,8 +24,14 @@ class ChatViewModel(
         loadMessage()
     }
 
-    fun sendMessage(id: String, message: String){
-        tcp.sendMessage(id, message)
+    fun sendMessage(user: User, message: String){
+        viewModelScope.launch(Dispatchers.IO) {
+            tcp.sendMessage(user.id, message)
+            withContext(Dispatchers.Main){
+                val currentMessage = _message.value ?: listOf()
+                _message.value = currentMessage + MessageDto(from = getYou(), message = message)
+            }
+        }
     }
 
     private fun loadMessage(){
@@ -37,7 +41,10 @@ class ChatViewModel(
                 _message.value = currentMessage + it
             }
         }
+    }
 
+    fun getYou(): User {
+        return tcp.you
     }
 
 }

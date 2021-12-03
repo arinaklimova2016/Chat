@@ -8,4 +8,7 @@ object Constants {
     const val USERNAME = "username"
     const val USERID = "userid"
 
+    const val VIEWTYPE1 = 0
+    const val VIEWTYPE2 = 1
+
 }
