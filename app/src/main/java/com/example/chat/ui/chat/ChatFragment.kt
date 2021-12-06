@@ -9,27 +9,23 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.chat.constants.Constants.USERID
-import com.example.chat.constants.Constants.USERNAME
+import com.example.chat.constants.Constants.USER
 import com.example.chat.databinding.FragmentChatBinding
 import com.example.chat.model.User
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.core.parameter.parametersOf
 
 class ChatFragment : Fragment() {
 
     private lateinit var binding: FragmentChatBinding
-    private val model by viewModel<ChatViewModel>()
+    private val model by viewModel<ChatViewModel>(parameters = { parametersOf(itemUser)})
 
     private val itemUser: User by lazy {
-        User(
-            requireArguments().getString(USERID)!!,
-            requireArguments().getString(USERNAME)!!
-        )
+        requireArguments().getParcelable(USER)!!
     }
 
     private val adapter by lazy {
         ChatAdapter(
-            message = model.message,
             receiver = itemUser,
             you = model.getYou()
         )
@@ -58,9 +54,9 @@ class ChatFragment : Fragment() {
         btnSend = binding.btnSendMessage
 
         txtView.text = itemUser.name
-        btnSend.setOnClickListener{
+        btnSend.setOnClickListener {
             val message: String = editText.text.toString()
-            model.sendMessage(itemUser, message)
+            model.sendMessage(message)
             editText.text.clear()
         }
 
@@ -69,7 +65,7 @@ class ChatFragment : Fragment() {
     }
 
     private fun observeToViewModel() {
-        model.message.observe(viewLifecycleOwner, {
+        model.messages.observe(viewLifecycleOwner, {
             adapter.submitList(it ?: listOf())
         })
     }
@@ -84,8 +80,7 @@ class ChatFragment : Fragment() {
         fun newInstance(receiver: User): ChatFragment {
             return ChatFragment().apply {
                 arguments = Bundle().apply {
-                    putString(USERNAME, receiver.name)
-                    putString(USERID, receiver.id)
+                    putParcelable(USER, receiver)
                 }
             }
         }

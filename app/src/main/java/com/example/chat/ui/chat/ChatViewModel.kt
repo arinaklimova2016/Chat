@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.chat.MessagesRepository
 import com.example.chat.model.MessageDto
 import com.example.chat.model.User
 import com.example.chat.server.TcpClient
@@ -11,35 +12,26 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
 
 class ChatViewModel(
-    private val tcp: TcpClient
+    private val tcp: TcpClient,
+    private val user: User,
+    private val map: MessagesRepository
 ) : ViewModel() {
 
-    private val job = SupervisorJob()
-    private val scope = CoroutineScope(job + Dispatchers.Main)
-
-    private val _message: MutableLiveData<List<MessageDto>> = MutableLiveData()
-    val message: LiveData<List<MessageDto>> = _message
+    private val _messages: MutableLiveData<List<MessageDto>> = MutableLiveData()
+    val messages: LiveData<List<MessageDto>> = _messages
 
     init {
-        loadMessage()
-    }
-
-    fun sendMessage(user: User, message: String){
-        viewModelScope.launch(Dispatchers.IO) {
-            tcp.sendMessage(user.id, message)
-            withContext(Dispatchers.Main){
-                val currentMessage = _message.value ?: listOf()
-                _message.value = currentMessage + MessageDto(from = getYou(), message = message)
+        viewModelScope.launch {
+            val get = map.getMessagesByUserId(user.id)
+            get.collect{
+                _messages.value = it
             }
         }
     }
 
-    private fun loadMessage(){
-        scope.launch {
-            tcp.newMessage.collect{
-                val currentMessage = _message.value ?: listOf()
-                _message.value = currentMessage + it
-            }
+    fun sendMessage(message: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            map.sendMessage(user, message)
         }
     }
 

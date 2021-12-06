@@ -15,7 +15,6 @@ import com.example.chat.model.MessageDto
 import com.example.chat.model.User
 
 class ChatAdapter(
-    private val message: LiveData<List<MessageDto>>,
     private val receiver: User,
     private val you: User
 ) : ListAdapter<MessageDto, ChatAdapter.MyViewHolder>(DiffCallback()) {

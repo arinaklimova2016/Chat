@@ -5,6 +5,8 @@ import com.example.chat.model.*
 import com.google.gson.Gson
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
@@ -20,7 +22,7 @@ class TcpClient {
     lateinit var you: User
     private var timer: Job? = null
     val usersList = MutableSharedFlow<UsersReceivedDto>()
-    val newMessage = MutableSharedFlow<MessageDto>()
+    val newMessage = MutableStateFlow(listOf<MessageDto>())
     private val job = SupervisorJob()
     private val scope = CoroutineScope(Dispatchers.IO + job)
 
@@ -79,7 +81,7 @@ class TcpClient {
                         usersList.emit(gson.fromJson(baseDto.payload, UsersReceivedDto::class.java))
                     }
                     BaseDto.Action.NEW_MESSAGE -> {
-                        newMessage.emit(gson.fromJson(baseDto.payload, MessageDto::class.java))
+                        newMessage.value = newMessage.value + gson.fromJson(baseDto.payload, MessageDto::class.java)
                     }
                     else -> {
                         close()
@@ -103,6 +105,7 @@ class TcpClient {
                 gson.toJson(SendMessageDto(you.id, receiver, message))
             )
         )
+        newMessage.value = newMessage.value + MessageDto(you, message)
         writer.println(sendMessage)
         writer.flush()
     }

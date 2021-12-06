@@ -1,9 +1,11 @@
 package com.example.chat.di
 
-import com.example.chat.ui.chat.ChatViewModel
-import com.example.chat.ui.login.LoginViewModel
+import com.example.chat.MessagesRepository
+import com.example.chat.MessagesRepositoryImpl
 import com.example.chat.server.TcpClient
 import com.example.chat.server.UdpClient
+import com.example.chat.ui.chat.ChatViewModel
+import com.example.chat.ui.login.LoginViewModel
 import com.example.chat.ui.users.UsersViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
@@ -23,9 +25,11 @@ val appModule = module {
         )
     }
 
-    viewModel {
+    viewModel { parameters ->
         ChatViewModel(
-            tcp = get()
+            tcp = get(),
+            user = parameters[0],
+            map = get()
         )
     }
 
@@ -37,12 +41,15 @@ val appModule = module {
         provideTcpClient()
     }
 
+    single<MessagesRepository> {
+        MessagesRepositoryImpl(tcp = get())
+    }
 }
 
 fun provideTcpClient(): TcpClient {
     return TcpClient()
 }
 
-private fun provideUdpClient():UdpClient{
+private fun provideUdpClient(): UdpClient {
     return UdpClient()
 }
