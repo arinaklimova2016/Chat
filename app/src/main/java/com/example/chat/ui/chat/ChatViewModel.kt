@@ -7,12 +7,11 @@ import androidx.lifecycle.viewModelScope
 import com.example.chat.MessagesRepository
 import com.example.chat.model.MessageDto
 import com.example.chat.model.User
-import com.example.chat.server.TcpClient
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 class ChatViewModel(
-    private val tcp: TcpClient,
     private val user: User,
     private val map: MessagesRepository
 ) : ViewModel() {
@@ -23,7 +22,7 @@ class ChatViewModel(
     init {
         viewModelScope.launch {
             val get = map.getMessagesByUserId(user.id)
-            get.collect{
+            get.collect {
                 _messages.value = it
             }
         }
@@ -36,7 +35,7 @@ class ChatViewModel(
     }
 
     fun getYou(): User {
-        return tcp.you
+        return map.getYou()
     }
 
 }

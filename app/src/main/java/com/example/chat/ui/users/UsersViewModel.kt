@@ -6,8 +6,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.chat.model.User
 import com.example.chat.server.TcpClient
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 class UsersViewModel(
     private val tcp: TcpClient
@@ -23,8 +25,8 @@ class UsersViewModel(
 
     fun getUsers() {
         viewModelScope.launch(Dispatchers.IO) {
-            while (true){
-                delay(2000)
+            while (true) {
+                delay(1000)
                 tcp.getUsers()
             }
         }
@@ -32,7 +34,8 @@ class UsersViewModel(
 
     private fun observer() {
         viewModelScope.launch {
-            tcp.usersList.collect {
+            val usersList = tcp.getUsersList()
+            usersList.collect {
                 _users.value = it.users
             }
         }

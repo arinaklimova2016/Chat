@@ -1,7 +1,7 @@
 package com.example.chat.main
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import com.example.chat.R
 import com.example.chat.databinding.ActivityMainBinding
 import com.example.chat.ui.login.LoginFragment

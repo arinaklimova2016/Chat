@@ -4,29 +4,30 @@ import com.example.chat.constants.Constants.TCP_PORT
 import com.example.chat.model.*
 import com.google.gson.Gson
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.firstOrNull
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
 import java.io.PrintWriter
 import java.net.Socket
 
-class TcpClient {
+class TcpClient : TcpInterface {
 
     private lateinit var socket: Socket
     private lateinit var reader: BufferedReader
     private lateinit var writer: PrintWriter
     private var gson = Gson()
-    lateinit var you: User
     private var timer: Job? = null
-    val usersList = MutableSharedFlow<UsersReceivedDto>()
-    val newMessage = MutableStateFlow(listOf<MessageDto>())
     private val job = SupervisorJob()
     private val scope = CoroutineScope(Dispatchers.IO + job)
+    private lateinit var you: User
+    private val usersList = MutableSharedFlow<UsersReceivedDto>()
+    private val newMessage = MutableStateFlow(listOf<MessageDto>())
 
-    fun createSocket(ip: String, name: String) {
+
+    override fun createSocket(ip: String, name: String) {
 
         socket = Socket(ip, TCP_PORT)
         socket.soTimeout = 15000
@@ -74,14 +75,16 @@ class TcpClient {
                 val baseDto = gson.fromJson(reader.readLine(), BaseDto::class.java)
                 when (baseDto.action) {
                     BaseDto.Action.PONG -> {
-                        delay(4000)
                         timer?.cancel()
                     }
                     BaseDto.Action.USERS_RECEIVED -> {
                         usersList.emit(gson.fromJson(baseDto.payload, UsersReceivedDto::class.java))
                     }
                     BaseDto.Action.NEW_MESSAGE -> {
-                        newMessage.value = newMessage.value + gson.fromJson(baseDto.payload, MessageDto::class.java)
+                        newMessage.value = newMessage.value + gson.fromJson(
+                            baseDto.payload,
+                            MessageDto::class.java
+                        )
                     }
                     else -> {
                         close()
@@ -91,14 +94,18 @@ class TcpClient {
         }
     }
 
-    suspend fun getUsers() {
+    override suspend fun getUsers() {
         val getUsers =
             gson.toJson(BaseDto(BaseDto.Action.GET_USERS, gson.toJson(GetUsersDto(you.id))))
         writer.println(getUsers)
         writer.flush()
     }
 
-    suspend fun sendMessage(receiver: String, message: String) {
+    override fun getUsersList(): Flow<UsersReceivedDto> {
+        return usersList
+    }
+
+    override suspend fun sendMessage(receiver: String, message: String) {
         val sendMessage = gson.toJson(
             BaseDto(
                 BaseDto.Action.SEND_MESSAGE,
@@ -108,6 +115,14 @@ class TcpClient {
         newMessage.value = newMessage.value + MessageDto(you, message)
         writer.println(sendMessage)
         writer.flush()
+    }
+
+    override fun getNewMessage(): Flow<List<MessageDto>> {
+        return newMessage
+    }
+
+    override fun getYou(): User {
+        return you
     }
 
     private fun close() {

@@ -18,7 +18,7 @@ import org.koin.core.parameter.parametersOf
 class ChatFragment : Fragment() {
 
     private lateinit var binding: FragmentChatBinding
-    private val model by viewModel<ChatViewModel>(parameters = { parametersOf(itemUser)})
+    private val model by viewModel<ChatViewModel>(parameters = { parametersOf(itemUser) })
 
     private val itemUser: User by lazy {
         requireArguments().getParcelable(USER)!!

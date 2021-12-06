@@ -27,7 +27,6 @@ val appModule = module {
 
     viewModel { parameters ->
         ChatViewModel(
-            tcp = get(),
             user = parameters[0],
             map = get()
         )
