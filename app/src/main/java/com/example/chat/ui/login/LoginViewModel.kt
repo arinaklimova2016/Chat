@@ -3,6 +3,7 @@ package com.example.chat.ui.login
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.chat.server.TcpClient
+import com.example.chat.server.TcpClientImpl
 import com.example.chat.server.UdpClient
 import com.example.chat.singleliveevent.SingleLiveEvent
 import kotlinx.coroutines.Dispatchers

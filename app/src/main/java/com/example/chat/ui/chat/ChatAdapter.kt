@@ -12,11 +12,12 @@ import com.example.chat.databinding.ReceiveMessageBinding
 import com.example.chat.databinding.SendMessageBinding
 import com.example.chat.model.MessageDto
 import com.example.chat.model.User
+import com.example.chat.room.Message
 
 class ChatAdapter(
     private val receiver: User,
     private val you: User
-) : ListAdapter<MessageDto, ChatAdapter.MyViewHolder>(DiffCallback()) {
+) : ListAdapter<Message, ChatAdapter.MyViewHolder>(DiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
         return if (viewType == VIEWTYPE1) {
@@ -48,19 +49,19 @@ class ChatAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (currentList[position].from == you) VIEWTYPE1 else VIEWTYPE2
+        return if (currentList[position].from == you.id) VIEWTYPE1 else VIEWTYPE2
     }
 
     abstract class MyViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        abstract fun bind(messageDto: MessageDto, user: User)
+        abstract fun bind(message: Message, user: User)
     }
 
     class SendViewHolder(binding: SendMessageBinding) : MyViewHolder(binding.root) {
 
         private val bindingSend: SendMessageBinding = binding
 
-        override fun bind(messageDto: MessageDto, user: User) {
-            bindingSend.txtSendMessage.text = messageDto.message
+        override fun bind(message: Message, user: User) {
+            bindingSend.txtSendMessage.text = message.message
             bindingSend.txtUsername.text = user.name
         }
     }
@@ -69,19 +70,19 @@ class ChatAdapter(
 
         private val bindingReceive: ReceiveMessageBinding = binding
 
-        override fun bind(messageDto: MessageDto, user: User) {
-            bindingReceive.txtReceiveMessage.text = messageDto.message
+        override fun bind(message: Message, user: User) {
+            bindingReceive.txtReceiveMessage.text = message.message
             bindingReceive.txtUsername.text = user.name
         }
     }
 
-    class DiffCallback : DiffUtil.ItemCallback<MessageDto>() {
+    class DiffCallback : DiffUtil.ItemCallback<Message>() {
 
-        override fun areItemsTheSame(oldMessge: MessageDto, newMessge: MessageDto): Boolean {
+        override fun areItemsTheSame(oldMessge: Message, newMessge: Message): Boolean {
             return oldMessge == newMessge
         }
 
-        override fun areContentsTheSame(oldMessge: MessageDto, newMessge: MessageDto): Boolean {
+        override fun areContentsTheSame(oldMessge: Message, newMessge: Message): Boolean {
             return oldMessge == newMessge
         }
     }

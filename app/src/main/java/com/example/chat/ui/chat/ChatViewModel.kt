@@ -5,8 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.chat.MessagesRepository
-import com.example.chat.model.MessageDto
 import com.example.chat.model.User
+import com.example.chat.room.Message
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -16,8 +16,8 @@ class ChatViewModel(
     private val map: MessagesRepository
 ) : ViewModel() {
 
-    private val _messages: MutableLiveData<List<MessageDto>> = MutableLiveData()
-    val messages: LiveData<List<MessageDto>> = _messages
+    private val _messages: MutableLiveData<List<Message>> = MutableLiveData()
+    val messages: LiveData<List<Message>> = _messages
 
     init {
         viewModelScope.launch {

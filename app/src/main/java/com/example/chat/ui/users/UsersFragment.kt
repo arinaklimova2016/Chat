@@ -60,11 +60,9 @@ class UsersFragment : Fragment() {
     }
 
     private fun observeToViewModel() {
-
         model.users.observe(viewLifecycleOwner, { t ->
             adapter.submitList(t ?: listOf())
         })
-
     }
 
 }

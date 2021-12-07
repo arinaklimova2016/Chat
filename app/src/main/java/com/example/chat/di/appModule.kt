@@ -1,8 +1,7 @@
 package com.example.chat.di
 
-import com.example.chat.MessagesRepository
-import com.example.chat.MessagesRepositoryImpl
 import com.example.chat.server.TcpClient
+import com.example.chat.server.TcpClientImpl
 import com.example.chat.server.UdpClient
 import com.example.chat.ui.chat.ChatViewModel
 import com.example.chat.ui.login.LoginViewModel
@@ -36,17 +35,9 @@ val appModule = module {
         provideUdpClient()
     }
 
-    single {
-        provideTcpClient()
+    single<TcpClient> {
+        TcpClientImpl()
     }
-
-    single<MessagesRepository> {
-        MessagesRepositoryImpl(tcp = get())
-    }
-}
-
-fun provideTcpClient(): TcpClient {
-    return TcpClient()
 }
 
 private fun provideUdpClient(): UdpClient {

@@ -2,6 +2,7 @@ package com.example.chat
 
 import android.app.Application
 import com.example.chat.di.appModule
+import com.example.chat.di.dataModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
@@ -16,6 +17,7 @@ class App : Application() {
             androidLogger(Level.DEBUG)
             androidContext(this@App)
             modules(appModule)
+            modules(dataModule)
         }
     }
 

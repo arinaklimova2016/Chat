@@ -10,4 +10,7 @@ object Constants {
     const val VIEWTYPE1 = 0
     const val VIEWTYPE2 = 1
 
+    const val TABLE_NAME = "table_chat"
+    const val ROOM_NAME = "chat_database.db"
+
 }
