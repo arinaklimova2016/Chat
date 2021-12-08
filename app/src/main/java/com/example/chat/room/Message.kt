@@ -1,7 +1,6 @@
 package com.example.chat.room
 
 import androidx.room.*
-import io.reactivex.Completable
 import kotlinx.coroutines.flow.Flow
 import java.util.*
 
@@ -12,12 +11,10 @@ data class Message(
     val from: String,
     val to: String,
     val message: String
-//    val timestamp: Long
 )
 
 @Dao
 interface MessageDao {
-
     @Query("SELECT * FROM Message WHERE `from` = :id OR `to` = :id")
     fun getById(id: String): Flow<List<Message>>
 
@@ -26,5 +23,4 @@ interface MessageDao {
 
     @Query("DELETE FROM Message")
     fun deleteAllChats()
-
 }

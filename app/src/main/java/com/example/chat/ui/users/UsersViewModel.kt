@@ -6,11 +6,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.chat.model.User
 import com.example.chat.server.TcpClient
-import com.example.chat.server.TcpClientImpl
+import com.example.chat.singleliveevent.SingleLiveEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class UsersViewModel(
     private val tcp: TcpClient
@@ -18,6 +19,7 @@ class UsersViewModel(
 
     private val _users: MutableLiveData<List<User>> = MutableLiveData()
     val users: LiveData<List<User>> = _users
+    val errorServer = SingleLiveEvent<Int>()
 
     init {
         observer()
@@ -34,6 +36,15 @@ class UsersViewModel(
     }
 
     private fun observer() {
+        viewModelScope.launch {
+            val showError = tcp.getError()
+            showError.collect {
+                withContext(Dispatchers.Main) {
+                    errorServer.value = it
+                }
+            }
+
+        }
         viewModelScope.launch {
             val usersList = tcp.getUsersList()
             usersList.collect {

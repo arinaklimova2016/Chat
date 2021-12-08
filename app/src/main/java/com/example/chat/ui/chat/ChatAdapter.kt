@@ -10,7 +10,6 @@ import com.example.chat.constants.Constants.VIEWTYPE1
 import com.example.chat.constants.Constants.VIEWTYPE2
 import com.example.chat.databinding.ReceiveMessageBinding
 import com.example.chat.databinding.SendMessageBinding
-import com.example.chat.model.MessageDto
 import com.example.chat.model.User
 import com.example.chat.room.Message
 
@@ -57,7 +56,6 @@ class ChatAdapter(
     }
 
     class SendViewHolder(binding: SendMessageBinding) : MyViewHolder(binding.root) {
-
         private val bindingSend: SendMessageBinding = binding
 
         override fun bind(message: Message, user: User) {
@@ -67,7 +65,6 @@ class ChatAdapter(
     }
 
     class ReceiveViewHolder(binding: ReceiveMessageBinding) : MyViewHolder(binding.root) {
-
         private val bindingReceive: ReceiveMessageBinding = binding
 
         override fun bind(message: Message, user: User) {
@@ -77,7 +74,6 @@ class ChatAdapter(
     }
 
     class DiffCallback : DiffUtil.ItemCallback<Message>() {
-
         override fun areItemsTheSame(oldMessge: Message, newMessge: Message): Boolean {
             return oldMessge == newMessge
         }

@@ -26,10 +26,9 @@ class TcpClientImpl : TcpClient {
     private lateinit var you: User
     private val usersList = MutableSharedFlow<UsersReceivedDto>()
     private val newMessage = MutableStateFlow<MessageDto?>(null)
-
+    private val showError = MutableSharedFlow<Int>()
 
     override fun createSocket(ip: String, name: String) {
-
         socket = Socket(ip, TCP_PORT)
         socket.soTimeout = 15000
         reader = BufferedReader(InputStreamReader(socket.getInputStream()))
@@ -51,7 +50,7 @@ class TcpClientImpl : TcpClient {
 
     private fun ping() {
         scope.launch {
-            while (socket.isConnected) {
+            while (!socket.isClosed) {
                 delay(5000)
                 val pingDto =
                     gson.toJson(BaseDto(BaseDto.Action.PING, gson.toJson(PingDto(you.id))))
@@ -65,6 +64,7 @@ class TcpClientImpl : TcpClient {
                     pong()
                 } catch (e: Exception) {
                     e.printStackTrace()
+                    close()
                 }
             }
         }
@@ -72,30 +72,37 @@ class TcpClientImpl : TcpClient {
 
     private fun pong() {
         scope.launch {
-            while (socket.isConnected) {
-                val baseDto = gson.fromJson(reader.readLine(), BaseDto::class.java)
-                when (baseDto.action) {
-                    BaseDto.Action.PONG -> {
-                        timer?.cancel()
+            while (!socket.isClosed) {
+                try {
+                    val baseDto = gson.fromJson(reader.readLine(), BaseDto::class.java)
+                    when (baseDto.action) {
+                        BaseDto.Action.PONG -> {
+                            timer?.cancel()
+                        }
+                        BaseDto.Action.USERS_RECEIVED -> {
+                            usersList.emit(gson.fromJson(baseDto.payload, UsersReceivedDto::class.java))
+                        }
+                        BaseDto.Action.NEW_MESSAGE -> {
+                            newMessage.value = gson.fromJson(
+                                baseDto.payload,
+                                MessageDto::class.java
+                            )
+                        }
+                        else -> {
+                            close()
+                        }
                     }
-                    BaseDto.Action.USERS_RECEIVED -> {
-                        usersList.emit(gson.fromJson(baseDto.payload, UsersReceivedDto::class.java))
-                    }
-                    BaseDto.Action.NEW_MESSAGE -> {
-                        newMessage.value = gson.fromJson(
-                            baseDto.payload,
-                            MessageDto::class.java
-                        )
-                    }
-                    else -> {
-                        close()
-                    }
+                } catch (e:java.lang.Exception){
+                    showError.emit(404)
+                    e.printStackTrace()
+                    close()
                 }
             }
         }
     }
 
     override suspend fun getUsers() {
+        delay(1000)
         val getUsers =
             gson.toJson(BaseDto(BaseDto.Action.GET_USERS, gson.toJson(GetUsersDto(you.id))))
         writer.println(getUsers)
@@ -113,13 +120,16 @@ class TcpClientImpl : TcpClient {
                 gson.toJson(SendMessageDto(you.id, receiver, message))
             )
         )
-//        newMessage.value = MessageDto(you, message)
         writer.println(sendMessage)
         writer.flush()
     }
 
     override fun getNewMessage(): Flow<MessageDto> {
         return newMessage.filterNotNull()
+    }
+
+    override fun getError(): Flow<Int> {
+        return showError
     }
 
     override fun getYou(): User {
@@ -130,6 +140,7 @@ class TcpClientImpl : TcpClient {
         writer.close()
         reader.close()
         socket.close()
+        job.cancelChildren()
     }
 
 }

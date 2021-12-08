@@ -7,8 +7,8 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
+import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import com.example.chat.R
 import com.example.chat.databinding.FragmentLoginBinding
 import com.example.chat.ui.users.UsersFragment
@@ -60,10 +60,22 @@ class LoginFragment : Fragment() {
     }
 
     private fun observeToViewModel() {
-        model.idSingleLiveEvent.observe(this, Observer {
-            println(it)
+        model.idSingleLiveEvent.observe(this, {
             createFragment()
         })
+        model.errorSingleLiveEvent.observe(this, {
+            progressBar.visibility = ProgressBar.INVISIBLE
+            Toast.makeText(
+                activity?.applicationContext,
+                "Не удалось подключится",
+                Toast.LENGTH_SHORT
+            ).show()
+        })
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        activity?.finish()
     }
 
 }

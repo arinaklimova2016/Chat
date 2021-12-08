@@ -7,11 +7,14 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.chat.R
 import com.example.chat.constants.Constants.USER
 import com.example.chat.databinding.FragmentChatBinding
 import com.example.chat.model.User
+import com.example.chat.ui.login.LoginFragment
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 
@@ -61,13 +64,29 @@ class ChatFragment : Fragment() {
         }
 
         observeToViewModel()
-
     }
 
     private fun observeToViewModel() {
         model.messages.observe(viewLifecycleOwner, {
             adapter.submitList(it ?: listOf())
         })
+        model.errorServer.observe(viewLifecycleOwner, {
+            Toast.makeText(
+                activity?.applicationContext,
+                "Соединение с сервером потеряно",
+                Toast.LENGTH_SHORT
+            ).show()
+            createLoginFragment()
+            onDestroy()
+        })
+    }
+
+    private fun createLoginFragment() {
+        val fragment = LoginFragment()
+        val fragmentTransaction = activity?.supportFragmentManager?.beginTransaction()
+        fragmentTransaction?.replace(R.id.fragment_container, fragment)
+            ?.addToBackStack("")
+            ?.commit()
     }
 
     private fun bindingRecycler() {

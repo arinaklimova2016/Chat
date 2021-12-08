@@ -8,12 +8,18 @@ import java.net.InetAddress
 import java.net.SocketException
 
 class UdpClient {
-
     suspend fun getServerIp(): String {
         val socket = DatagramSocket()
         var ip = ""
+        var count = 100
 
         while (ip.isEmpty()) {
+
+            if (count == 0) {
+                throw Exception("Error")
+            }
+            count--
+
             try {
                 val message = "Hello World".toByteArray()
                 var packet = DatagramPacket(
@@ -34,11 +40,12 @@ class UdpClient {
                 e.printStackTrace()
             } catch (e: IOException) {
                 e.printStackTrace()
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
         }
 
         socket.close()
         return ip
     }
-
 }
