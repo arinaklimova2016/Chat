@@ -7,15 +7,19 @@ import java.net.DatagramSocket
 import java.net.InetAddress
 import java.net.SocketException
 
+
+//сделать интерфейс
 class UdpClient {
     suspend fun getServerIp(): String {
         val socket = DatagramSocket()
         var ip = ""
-        var count = 100
+
+        var count = 20
 
         while (ip.isEmpty()) {
 
             if (count == 0) {
+                //другой
                 throw Exception("Error")
             }
             count--
@@ -25,6 +29,7 @@ class UdpClient {
                 var packet = DatagramPacket(
                     message,
                     message.size,
+                    //конст
                     InetAddress.getByName("255.255.255.255"),
                     UPD_PORT
                 )

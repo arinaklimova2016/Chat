@@ -15,11 +15,11 @@ class MainActivity : AppCompatActivity() {
         createFragment()
     }
 
+    //переименовать везде
     private fun createFragment() {
         val fragment = LoginFragment()
         val fragmentTransaction = supportFragmentManager.beginTransaction()
         fragmentTransaction.replace(R.id.fragment_container, fragment)
-            .addToBackStack("")
             .commit()
     }
 }

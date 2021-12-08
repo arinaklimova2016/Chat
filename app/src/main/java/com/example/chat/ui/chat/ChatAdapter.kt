@@ -39,6 +39,7 @@ class ChatAdapter(
     }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
+        //переименовать
         val whatType = if (getItemViewType(position) == VIEWTYPE1) {
             you
         } else {
@@ -51,10 +52,12 @@ class ChatAdapter(
         return if (currentList[position].from == you.id) VIEWTYPE1 else VIEWTYPE2
     }
 
+    //переименовать
     abstract class MyViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         abstract fun bind(message: Message, user: User)
     }
 
+    //переделать
     class SendViewHolder(binding: SendMessageBinding) : MyViewHolder(binding.root) {
         private val bindingSend: SendMessageBinding = binding
 
@@ -64,6 +67,7 @@ class ChatAdapter(
         }
     }
 
+    //то же самое
     class ReceiveViewHolder(binding: ReceiveMessageBinding) : MyViewHolder(binding.root) {
         private val bindingReceive: ReceiveMessageBinding = binding
 
@@ -75,7 +79,7 @@ class ChatAdapter(
 
     class DiffCallback : DiffUtil.ItemCallback<Message>() {
         override fun areItemsTheSame(oldMessge: Message, newMessge: Message): Boolean {
-            return oldMessge == newMessge
+            return oldMessge.id == newMessge.id
         }
 
         override fun areContentsTheSame(oldMessge: Message, newMessge: Message): Boolean {

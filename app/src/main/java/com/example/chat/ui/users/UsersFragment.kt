@@ -68,11 +68,11 @@ class UsersFragment : Fragment() {
         model.errorServer.observe(viewLifecycleOwner, {
             Toast.makeText(
                 activity?.applicationContext,
+                //ресурсы
                 "Соединение с сервером потеряно",
                 Toast.LENGTH_SHORT
             ).show()
             createLoginFragment()
-            onDestroy()
         })
     }
 

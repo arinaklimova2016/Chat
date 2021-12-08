@@ -1,5 +1,6 @@
 package com.example.chat.ui.login
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -19,6 +20,8 @@ class LoginFragment : Fragment() {
     private lateinit var binding: FragmentLoginBinding
 
     private val model by viewModel<LoginViewModel>()
+
+    //разобраться с вьюшками
     private lateinit var btnLogIn: Button
     private lateinit var editEmail: EditText
     private lateinit var progressBar: ProgressBar
@@ -39,11 +42,11 @@ class LoginFragment : Fragment() {
         editEmail = binding.editEmail
         progressBar = binding.progressBar
 
+        observeToViewModel()
 
         btnLogIn.setOnClickListener {
             progressBar.visibility = ProgressBar.VISIBLE
             val name: String = editEmail.text.toString()
-            observeToViewModel()
             model.getIp(name)
         }
     }
@@ -67,6 +70,7 @@ class LoginFragment : Fragment() {
             progressBar.visibility = ProgressBar.INVISIBLE
             Toast.makeText(
                 activity?.applicationContext,
+                //в ресурсы строку
                 "Не удалось подключится",
                 Toast.LENGTH_SHORT
             ).show()
@@ -78,4 +82,16 @@ class LoginFragment : Fragment() {
         activity?.finish()
     }
 
+}
+
+
+var toast: Toast? = null
+fun Context.toast(message: String, length: Int = Toast.LENGTH_SHORT) {
+    toast?.cancel()
+    toast = Toast.makeText(this, message, length)
+    toast?.show()
+}
+
+fun Fragment.toast(message: String, length: Int = Toast.LENGTH_SHORT) {
+    context?.toast(message, length)
 }

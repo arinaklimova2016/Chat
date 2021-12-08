@@ -1,57 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5DCC9"
+    android:background="@color/grey"
     tools:context=".ui.chat.ChatFragment">
 
     <TextView
         android:id="@+id/username"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:background="#FB8C4B"
-        android:gravity="center"
-        android:textColor="#7A1F00"
+        android:background="@color/brick"
+        android:textColor="@color/beige"
         android:textSize="17sp"
         android:textStyle="bold"
+        android:gravity="center"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         tools:text="here username" />
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_messages"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/username"
-        android:layout_marginBottom="50dp" />
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/edit_message"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/username" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_marginTop="5dp"
-        android:background="#F5DCC9"
-        android:orientation="horizontal"
-        android:weightSum="100">
+    <EditText
+        android:id="@+id/edit_message"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:background="@drawable/edit_background"
+        android:hint="@string/enter_your_message"
+        android:paddingStart="7dp"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/btn_send_message"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/recycler_messages" />
 
-        <EditText
-            android:id="@+id/edit_message"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_weight="70"
-            android:paddingLeft="7dp"
-            android:background="@drawable/edit_background"
-            android:hint="@string/enter_your_message"
-            android:textSize="12sp" />
-
-        <ImageView
-            android:id="@+id/btn_send_message"
-            android:layout_width="70dp"
-            android:layout_height="50dp"
-            android:layout_weight="30"
-            android:src="@drawable/send_icon" />
-
-    </LinearLayout>
+    <ImageView
+        android:id="@+id/btn_send_message"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/send_icon"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/edit_message"
+        app:layout_constraintTop_toBottomOf="@+id/recycler_messages" />
 
 
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

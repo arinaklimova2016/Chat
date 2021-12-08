@@ -9,6 +9,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.chat.R
 import com.example.chat.constants.Constants.USER
@@ -55,6 +56,13 @@ class ChatFragment : Fragment() {
         txtView = binding.username
         editText = binding.editMessage
         btnSend = binding.btnSendMessage
+        ////////////
+        with(binding) {
+            username.text = itemUser.name
+            btnSend.setOnClickListener {
+
+            }
+        }
 
         txtView.text = itemUser.name
         btnSend.setOnClickListener {
@@ -63,10 +71,10 @@ class ChatFragment : Fragment() {
             editText.text.clear()
         }
 
-        observeToViewModel()
+        observeViewModel()
     }
 
-    private fun observeToViewModel() {
+    private fun observeViewModel() {
         model.messages.observe(viewLifecycleOwner, {
             adapter.submitList(it ?: listOf())
         })
@@ -77,11 +85,11 @@ class ChatFragment : Fragment() {
                 Toast.LENGTH_SHORT
             ).show()
             createLoginFragment()
-            onDestroy()
         })
     }
 
     private fun createLoginFragment() {
+        activity?.supportFragmentManager?.popBackStack("", 0)
         val fragment = LoginFragment()
         val fragmentTransaction = activity?.supportFragmentManager?.beginTransaction()
         fragmentTransaction?.replace(R.id.fragment_container, fragment)
@@ -95,7 +103,6 @@ class ChatFragment : Fragment() {
     }
 
     companion object {
-        @JvmStatic
         fun newInstance(receiver: User): ChatFragment {
             return ChatFragment().apply {
                 arguments = Bundle().apply {

@@ -13,6 +13,7 @@ data class Message(
     val message: String
 )
 
+//в отдельный файл
 @Dao
 interface MessageDao {
     @Query("SELECT * FROM Message WHERE `from` = :id OR `to` = :id")

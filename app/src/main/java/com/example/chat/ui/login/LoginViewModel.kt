@@ -14,6 +14,7 @@ class LoginViewModel(
     private val tcp: TcpClient
 ) : ViewModel() {
 
+    //переименовать
     val idSingleLiveEvent = SingleLiveEvent<Unit>()
     val errorSingleLiveEvent = SingleLiveEvent<Unit>()
 

@@ -8,4 +8,10 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="brown">#A84900</color>
+
+    <color name="grey">#dbdad6</color>
+    <color name="beige">#beab9e</color>
+    <color name="okra">#b3814e</color>
+    <color name="brick">#723505</color>
+    <color name="almost_black">#202020</color>
 </resources>

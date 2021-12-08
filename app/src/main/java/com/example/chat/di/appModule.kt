@@ -40,6 +40,7 @@ val appModule = module {
     }
 }
 
+//в дата и провайдить всё одним типом
 private fun provideUdpClient(): UdpClient {
     return UdpClient()
 }

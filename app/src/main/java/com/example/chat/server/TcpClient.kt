@@ -6,7 +6,7 @@ import com.example.chat.model.UsersReceivedDto
 import kotlinx.coroutines.flow.Flow
 
 interface TcpClient {
-    fun createSocket(ip: String, name: String)
+    suspend fun createSocket(ip: String, name: String)
     suspend fun getUsers()
     fun getUsersList(): Flow<UsersReceivedDto>
     suspend fun sendMessage(receiver: String, message: String)

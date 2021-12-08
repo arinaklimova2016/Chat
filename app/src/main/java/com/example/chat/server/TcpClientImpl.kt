@@ -28,12 +28,15 @@ class TcpClientImpl : TcpClient {
     private val newMessage = MutableStateFlow<MessageDto?>(null)
     private val showError = MutableSharedFlow<Int>()
 
-    override fun createSocket(ip: String, name: String) {
+    override suspend fun createSocket(ip: String, name: String) {
         socket = Socket(ip, TCP_PORT)
+        //таймаут в константу
         socket.soTimeout = 15000
         reader = BufferedReader(InputStreamReader(socket.getInputStream()))
         writer = PrintWriter(OutputStreamWriter(socket.getOutputStream()))
+        //понг
         gson = Gson()
+        //перенести в понг
         val baseDto = gson.fromJson(reader.readLine(), BaseDto::class.java)
         val connectedDto = gson.fromJson(baseDto?.payload, ConnectedDto::class.java)
         val connectDto = gson.toJson(ConnectDto(connectedDto.id, name))
@@ -51,6 +54,7 @@ class TcpClientImpl : TcpClient {
     private fun ping() {
         scope.launch {
             while (!socket.isClosed) {
+                //константы
                 delay(5000)
                 val pingDto =
                     gson.toJson(BaseDto(BaseDto.Action.PING, gson.toJson(PingDto(you.id))))
@@ -61,6 +65,7 @@ class TcpClientImpl : TcpClient {
                         delay(5000)
                         close()
                     }
+                    //убрать
                     pong()
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -70,6 +75,7 @@ class TcpClientImpl : TcpClient {
         }
     }
 
+    //переименовать
     private fun pong() {
         scope.launch {
             while (!socket.isClosed) {
@@ -102,7 +108,6 @@ class TcpClientImpl : TcpClient {
     }
 
     override suspend fun getUsers() {
-        delay(1000)
         val getUsers =
             gson.toJson(BaseDto(BaseDto.Action.GET_USERS, gson.toJson(GetUsersDto(you.id))))
         writer.println(getUsers)

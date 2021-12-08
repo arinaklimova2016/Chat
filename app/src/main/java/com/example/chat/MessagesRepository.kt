@@ -19,6 +19,8 @@ interface MessagesRepository {
     fun getError(): Flow<Int>
 }
 
+//разделить
+
 class MessagesRepositoryImpl(
     private val tcp: TcpClient,
     private val messageDao: MessageDao
@@ -30,6 +32,7 @@ class MessagesRepositoryImpl(
     private val job = SupervisorJob()
     private val scope = CoroutineScope(Dispatchers.IO + job)
 
+    //переименовать
     private val showError = MutableSharedFlow<Int>()
 
     init {

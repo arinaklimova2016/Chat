@@ -15,29 +15,28 @@ import kotlinx.coroutines.withContext
 
 class ChatViewModel(
     private val user: User,
+    //переименовать
     private val map: MessagesRepository
 ) : ViewModel() {
 
     private val _messages: MutableLiveData<List<Message>> = MutableLiveData()
     val messages: LiveData<List<Message>> = _messages
 
+    //спрятать в лайв дата
     val errorServer = SingleLiveEvent<Int>()
 
     init {
         viewModelScope.launch {
-            val get = map.getMessagesByUserId(user.id)
-            get.collect {
+            map.getMessagesByUserId(user.id).collect {
                 _messages.value = it
             }
         }
         viewModelScope.launch {
-            val showError = map.getError()
-            showError.collect {
+            map.getError().collect {
                 withContext(Dispatchers.Main) {
                     errorServer.value = it
                 }
             }
-
         }
     }
 
