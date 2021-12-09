@@ -1,7 +1,7 @@
-package com.example.chat.server
+package com.example.chat.data.server
 
-import com.example.chat.constants.Constants.TCP_PORT
 import com.example.chat.model.*
+import com.example.chat.utils.Constants.DELAY
 import com.google.gson.Gson
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
@@ -19,34 +19,39 @@ class TcpClientImpl : TcpClient {
     private lateinit var socket: Socket
     private lateinit var reader: BufferedReader
     private lateinit var writer: PrintWriter
+    private lateinit var you: User
+    private lateinit var userId: ConnectedDto
     private var gson = Gson()
     private var timer: Job? = null
     private val job = SupervisorJob()
     private val scope = CoroutineScope(Dispatchers.IO + job)
-    private lateinit var you: User
     private val usersList = MutableSharedFlow<UsersReceivedDto>()
     private val newMessage = MutableStateFlow<MessageDto?>(null)
     private val showError = MutableSharedFlow<Int>()
 
+    companion object {
+        const val TCP_PORT = 6666
+        const val TIMEOUT = 15000
+        const val ERROR404 = 404
+    }
+
     override suspend fun createSocket(ip: String, name: String) {
         socket = Socket(ip, TCP_PORT)
-        //таймаут в константу
-        socket.soTimeout = 15000
+        socket.soTimeout = TIMEOUT
         reader = BufferedReader(InputStreamReader(socket.getInputStream()))
         writer = PrintWriter(OutputStreamWriter(socket.getOutputStream()))
-        //понг
+        inspector()
         gson = Gson()
-        //перенести в понг
-        val baseDto = gson.fromJson(reader.readLine(), BaseDto::class.java)
-        val connectedDto = gson.fromJson(baseDto?.payload, ConnectedDto::class.java)
-        val connectDto = gson.toJson(ConnectDto(connectedDto.id, name))
 
-        you = User(connectedDto.id, name)
-
-        val baseDtoJson = gson.toJson(BaseDto(BaseDto.Action.CONNECT, connectDto))
-
-        //send
-        writer.println(baseDtoJson)
+        you = User(userId.id, name)
+        writer.println(
+            gson.toJson(
+                BaseDto(
+                    BaseDto.Action.CONNECT,
+                    gson.toJson(ConnectDto(userId.id, name))
+                )
+            )
+        )
         writer.flush()
         ping()
     }
@@ -54,19 +59,21 @@ class TcpClientImpl : TcpClient {
     private fun ping() {
         scope.launch {
             while (!socket.isClosed) {
-                //константы
-                delay(5000)
-                val pingDto =
-                    gson.toJson(BaseDto(BaseDto.Action.PING, gson.toJson(PingDto(you.id))))
+                delay(DELAY)
                 try {
-                    writer.println(pingDto)
+                    writer.println(
+                        gson.toJson(
+                            BaseDto(
+                                BaseDto.Action.PING,
+                                gson.toJson(PingDto(you.id))
+                            )
+                        )
+                    )
                     writer.flush()
                     timer = scope.launch {
-                        delay(5000)
+                        delay(DELAY)
                         close()
                     }
-                    //убрать
-                    pong()
                 } catch (e: Exception) {
                     e.printStackTrace()
                     close()
@@ -75,18 +82,25 @@ class TcpClientImpl : TcpClient {
         }
     }
 
-    //переименовать
-    private fun pong() {
+    private fun inspector() {
         scope.launch {
             while (!socket.isClosed) {
                 try {
                     val baseDto = gson.fromJson(reader.readLine(), BaseDto::class.java)
                     when (baseDto.action) {
+                        BaseDto.Action.CONNECTED -> {
+                            userId = gson.fromJson(baseDto.payload, ConnectedDto::class.java)
+                        }
                         BaseDto.Action.PONG -> {
                             timer?.cancel()
                         }
                         BaseDto.Action.USERS_RECEIVED -> {
-                            usersList.emit(gson.fromJson(baseDto.payload, UsersReceivedDto::class.java))
+                            usersList.emit(
+                                gson.fromJson(
+                                    baseDto.payload,
+                                    UsersReceivedDto::class.java
+                                )
+                            )
                         }
                         BaseDto.Action.NEW_MESSAGE -> {
                             newMessage.value = gson.fromJson(
@@ -98,8 +112,8 @@ class TcpClientImpl : TcpClient {
                             close()
                         }
                     }
-                } catch (e:java.lang.Exception){
-                    showError.emit(404)
+                } catch (e: java.lang.Exception) {
+                    showError.emit(ERROR404)
                     e.printStackTrace()
                     close()
                 }
@@ -108,9 +122,14 @@ class TcpClientImpl : TcpClient {
     }
 
     override suspend fun getUsers() {
-        val getUsers =
-            gson.toJson(BaseDto(BaseDto.Action.GET_USERS, gson.toJson(GetUsersDto(you.id))))
-        writer.println(getUsers)
+        writer.println(
+            gson.toJson(
+                BaseDto(
+                    BaseDto.Action.GET_USERS,
+                    gson.toJson(GetUsersDto(you.id))
+                )
+            )
+        )
         writer.flush()
     }
 
@@ -119,13 +138,14 @@ class TcpClientImpl : TcpClient {
     }
 
     override suspend fun sendMessage(receiver: String, message: String) {
-        val sendMessage = gson.toJson(
-            BaseDto(
-                BaseDto.Action.SEND_MESSAGE,
-                gson.toJson(SendMessageDto(you.id, receiver, message))
+        writer.println(
+            gson.toJson(
+                BaseDto(
+                    BaseDto.Action.SEND_MESSAGE,
+                    gson.toJson(SendMessageDto(you.id, receiver, message))
+                )
             )
         )
-        writer.println(sendMessage)
         writer.flush()
     }
 

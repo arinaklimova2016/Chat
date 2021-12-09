@@ -1,9 +1,9 @@
-package com.example.chat
+package com.example.chat.data.repository
 
+import com.example.chat.data.room.Message
+import com.example.chat.data.room.MessageDao
+import com.example.chat.data.server.TcpClient
 import com.example.chat.model.User
-import com.example.chat.room.Message
-import com.example.chat.room.MessageDao
-import com.example.chat.server.TcpClient
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -11,15 +11,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-
-interface MessagesRepository {
-    suspend fun getMessagesByUserId(id: String): Flow<List<Message>>
-    suspend fun sendMessage(user: User, message: String)
-    fun getYou(): User
-    fun getError(): Flow<Int>
-}
-
-//разделить
 
 class MessagesRepositoryImpl(
     private val tcp: TcpClient,
@@ -32,8 +23,7 @@ class MessagesRepositoryImpl(
     private val job = SupervisorJob()
     private val scope = CoroutineScope(Dispatchers.IO + job)
 
-    //переименовать
-    private val showError = MutableSharedFlow<Int>()
+    private val errorListener = MutableSharedFlow<Int>()
 
     init {
         scope.launch(Dispatchers.IO) {
@@ -51,7 +41,7 @@ class MessagesRepositoryImpl(
         scope.launch {
             val getError = tcp.getError()
             getError.collect {
-                showError.emit(it)
+                errorListener.emit(it)
             }
         }
     }
@@ -71,7 +61,7 @@ class MessagesRepositoryImpl(
     }
 
     override fun getError(): Flow<Int> {
-        return showError
+        return errorListener
     }
 
 }

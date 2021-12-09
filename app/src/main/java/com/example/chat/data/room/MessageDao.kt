@@ -1,19 +1,10 @@
-package com.example.chat.room
+package com.example.chat.data.room
 
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
-import java.util.*
 
-@Entity
-data class Message(
-    @PrimaryKey
-    val id: String = UUID.randomUUID().toString(),
-    val from: String,
-    val to: String,
-    val message: String
-)
-
-//в отдельный файл
 @Dao
 interface MessageDao {
     @Query("SELECT * FROM Message WHERE `from` = :id OR `to` = :id")

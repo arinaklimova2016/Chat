@@ -25,7 +25,7 @@
         android:background="@drawable/edit_background"
         android:hint="@string/email"
         android:paddingStart="10dp"
-        android:textColor="@color/brick"
+        android:textColor="@color/almost_black"
         android:layout_marginRight="40dp"
         android:layout_marginLeft="40dp"
         app:layout_constraintLeft_toLeftOf="parent"

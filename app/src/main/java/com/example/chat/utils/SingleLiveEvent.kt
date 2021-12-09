@@ -1,4 +1,4 @@
-package com.example.chat.singleliveevent
+package com.example.chat.utils
 
 import android.util.Log
 import androidx.annotation.MainThread
@@ -7,7 +7,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import java.util.concurrent.atomic.AtomicBoolean
 
-//переместить
 class SingleLiveEvent<T> : MutableLiveData<T>() {
     private val pending = AtomicBoolean(false)
 

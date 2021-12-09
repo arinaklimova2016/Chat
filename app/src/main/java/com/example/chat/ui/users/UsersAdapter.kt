@@ -29,16 +29,18 @@ class UsersAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(user: User, onClick: (User) -> Unit) {
-            binding.user.text = user.name
-            binding.root.setOnClickListener {
-                onClick(user)
+            with(binding) {
+                userName.text = user.name
+                root.setOnClickListener {
+                    onClick(user)
+                }
             }
         }
     }
 
     class DiffCallback : DiffUtil.ItemCallback<User>() {
         override fun areItemsTheSame(oldUser: User, newUser: User): Boolean {
-            return oldUser == newUser
+            return oldUser.id == newUser.id
         }
 
         override fun areContentsTheSame(oldUser: User, newUser: User): Boolean {

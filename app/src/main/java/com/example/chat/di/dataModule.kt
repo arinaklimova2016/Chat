@@ -1,16 +1,17 @@
 package com.example.chat.di
 
 import androidx.room.Room
-import com.example.chat.MessagesRepository
-import com.example.chat.MessagesRepositoryImpl
-import com.example.chat.constants.Constants
-import com.example.chat.room.ChatDatabase
-import com.example.chat.room.MessageDao
+import com.example.chat.data.repository.MessagesRepository
+import com.example.chat.data.repository.MessagesRepositoryImpl
+import com.example.chat.data.room.ChatDatabase
+import com.example.chat.data.server.TcpClient
+import com.example.chat.data.server.TcpClientImpl
+import com.example.chat.data.server.UdpClient
+import com.example.chat.data.server.UdpClientImpl
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 
 val dataModule = module {
-
     single<MessagesRepository> {
         MessagesRepositoryImpl(tcp = get(), messageDao = get())
     }
@@ -19,15 +20,21 @@ val dataModule = module {
         Room.databaseBuilder(
             androidContext(),
             ChatDatabase::class.java,
-            Constants.ROOM_NAME
+            ROOM_NAME
         ).build()
     }
 
+    single<TcpClient> {
+        TcpClientImpl()
+    }
+
+    single<UdpClient> {
+        UdpClientImpl()
+    }
+
     factory {
-        provideMessageDao(get())
+        get<ChatDatabase>().messageDao()
     }
 }
 
-private fun provideMessageDao(database: ChatDatabase): MessageDao {
-    return database.messageDao()
-}
+const val ROOM_NAME = "chat_database.db"

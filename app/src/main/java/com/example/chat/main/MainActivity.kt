@@ -12,11 +12,10 @@ class MainActivity : AppCompatActivity() {
         val binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        createFragment()
+        transitionToTheNextWindow()
     }
 
-    //переименовать везде
-    private fun createFragment() {
+    private fun transitionToTheNextWindow() {
         val fragment = LoginFragment()
         val fragmentTransaction = supportFragmentManager.beginTransaction()
         fragmentTransaction.replace(R.id.fragment_container, fragment)

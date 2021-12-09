@@ -1,4 +1,4 @@
-package com.example.chat.room
+package com.example.chat.data.room
 
 import androidx.room.Database
 import androidx.room.RoomDatabase

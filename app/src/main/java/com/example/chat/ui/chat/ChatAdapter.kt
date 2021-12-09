@@ -6,20 +6,23 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.chat.constants.Constants.VIEWTYPE1
-import com.example.chat.constants.Constants.VIEWTYPE2
+import com.example.chat.data.room.Message
 import com.example.chat.databinding.ReceiveMessageBinding
 import com.example.chat.databinding.SendMessageBinding
 import com.example.chat.model.User
-import com.example.chat.room.Message
 
 class ChatAdapter(
     private val receiver: User,
     private val you: User
-) : ListAdapter<Message, ChatAdapter.MyViewHolder>(DiffCallback()) {
+) : ListAdapter<Message, ChatAdapter.BaseViewHolder>(DiffCallback()) {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
-        return if (viewType == VIEWTYPE1) {
+    companion object {
+        const val SENDMESSAGE = 0
+        const val RECEIVEMESSAGE = 1
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
+        return if (viewType == SENDMESSAGE) {
             SendViewHolder(
                 SendMessageBinding.inflate(
                     LayoutInflater.from(parent.context),
@@ -38,42 +41,44 @@ class ChatAdapter(
         }
     }
 
-    override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        //переименовать
-        val whatType = if (getItemViewType(position) == VIEWTYPE1) {
+    override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
+        val whoWroteTheMessage = if (getItemViewType(position) == SENDMESSAGE) {
             you
         } else {
             receiver
         }
-        holder.bind(currentList[position], whatType)
+        holder.bind(currentList[position], whoWroteTheMessage)
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (currentList[position].from == you.id) VIEWTYPE1 else VIEWTYPE2
+        return if (currentList[position].from == you.id) SENDMESSAGE else RECEIVEMESSAGE
     }
 
-    //переименовать
-    abstract class MyViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    abstract class BaseViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         abstract fun bind(message: Message, user: User)
     }
 
-    //переделать
-    class SendViewHolder(binding: SendMessageBinding) : MyViewHolder(binding.root) {
-        private val bindingSend: SendMessageBinding = binding
+    class SendViewHolder(
+        private val binding: SendMessageBinding
+    ) : BaseViewHolder(binding.root) {
 
         override fun bind(message: Message, user: User) {
-            bindingSend.txtSendMessage.text = message.message
-            bindingSend.txtUsername.text = user.name
+            with(binding) {
+                txtSendMessage.text = message.message
+                txtUsername.text = user.name
+            }
         }
     }
 
-    //то же самое
-    class ReceiveViewHolder(binding: ReceiveMessageBinding) : MyViewHolder(binding.root) {
-        private val bindingReceive: ReceiveMessageBinding = binding
+    class ReceiveViewHolder(
+        private val binding: ReceiveMessageBinding
+    ) : BaseViewHolder(binding.root) {
 
         override fun bind(message: Message, user: User) {
-            bindingReceive.txtReceiveMessage.text = message.message
-            bindingReceive.txtUsername.text = user.name
+            with(binding) {
+                txtReceiveMessage.text = message.message
+                txtUsername.text = user.name
+            }
         }
     }
 

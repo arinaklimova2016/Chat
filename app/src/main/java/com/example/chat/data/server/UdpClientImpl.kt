@@ -1,42 +1,47 @@
-package com.example.chat.server
+package com.example.chat.data.server
 
-import com.example.chat.constants.Constants.UPD_PORT
+import com.example.chat.utils.Constants.DELAY
 import java.io.IOException
 import java.net.DatagramPacket
 import java.net.DatagramSocket
 import java.net.InetAddress
 import java.net.SocketException
+import java.nio.channels.NoConnectionPendingException
 
+class UdpClientImpl : UdpClient {
 
-//сделать интерфейс
-class UdpClient {
-    suspend fun getServerIp(): String {
+    companion object {
+        const val HOST = "255.255.255.255"
+        const val MESSAGE = "Hello World"
+        const val COUNT = 20
+        const val BYTEARRAYSIZE = 256
+        const val UPD_PORT = 8888
+    }
+
+    override suspend fun getServerIp(): String {
         val socket = DatagramSocket()
         var ip = ""
-
-        var count = 20
+        var count = COUNT
 
         while (ip.isEmpty()) {
 
             if (count == 0) {
-                //другой
-                throw Exception("Error")
+                throw NoConnectionPendingException()
             }
             count--
 
             try {
-                val message = "Hello World".toByteArray()
+                val message = MESSAGE.toByteArray()
                 var packet = DatagramPacket(
                     message,
                     message.size,
-                    //конст
-                    InetAddress.getByName("255.255.255.255"),
+                    InetAddress.getByName(HOST),
                     UPD_PORT
                 )
-                socket.soTimeout = 5000
+                socket.soTimeout = DELAY.toInt()
                 socket.send(packet)
 
-                val buffer = ByteArray(256)
+                val buffer = ByteArray(BYTEARRAYSIZE)
                 packet = DatagramPacket(buffer, buffer.size)
                 socket.receive(packet)
                 ip = packet.address.hostAddress

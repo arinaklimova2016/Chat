@@ -1,4 +1,4 @@
-package com.example.chat.server
+package com.example.chat.data.server
 
 import com.example.chat.model.MessageDto
 import com.example.chat.model.User

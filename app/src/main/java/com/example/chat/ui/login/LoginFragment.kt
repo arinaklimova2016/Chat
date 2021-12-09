@@ -1,12 +1,9 @@
 package com.example.chat.ui.login
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -18,13 +15,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class LoginFragment : Fragment() {
 
     private lateinit var binding: FragmentLoginBinding
-
     private val model by viewModel<LoginViewModel>()
-
-    //разобраться с вьюшками
-    private lateinit var btnLogIn: Button
-    private lateinit var editEmail: EditText
-    private lateinit var progressBar: ProgressBar
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -38,20 +29,17 @@ class LoginFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        btnLogIn = binding.logIn
-        editEmail = binding.editEmail
-        progressBar = binding.progressBar
-
         observeToViewModel()
-
-        btnLogIn.setOnClickListener {
-            progressBar.visibility = ProgressBar.VISIBLE
-            val name: String = editEmail.text.toString()
-            model.getIp(name)
+        with(binding) {
+            logIn.setOnClickListener {
+                progressBar.visibility = ProgressBar.VISIBLE
+                val name: String = editEmail.text.toString()
+                model.getIp(name)
+            }
         }
     }
 
-    private fun createFragment() {
+    private fun transitionToTheNextWindow() {
         val fragment = UsersFragment()
         val fragmentTransaction = activity?.supportFragmentManager?.beginTransaction()
         fragmentTransaction?.replace(
@@ -63,15 +51,14 @@ class LoginFragment : Fragment() {
     }
 
     private fun observeToViewModel() {
-        model.idSingleLiveEvent.observe(this, {
-            createFragment()
+        model.listenerId.observe(this, {
+            transitionToTheNextWindow()
         })
-        model.errorSingleLiveEvent.observe(this, {
-            progressBar.visibility = ProgressBar.INVISIBLE
+        model.listenerError.observe(this, {
+            binding.progressBar.visibility = ProgressBar.INVISIBLE
             Toast.makeText(
                 activity?.applicationContext,
-                //в ресурсы строку
-                "Не удалось подключится",
+                TOAST_TXT,
                 Toast.LENGTH_SHORT
             ).show()
         })
@@ -82,16 +69,7 @@ class LoginFragment : Fragment() {
         activity?.finish()
     }
 
-}
-
-
-var toast: Toast? = null
-fun Context.toast(message: String, length: Int = Toast.LENGTH_SHORT) {
-    toast?.cancel()
-    toast = Toast.makeText(this, message, length)
-    toast?.show()
-}
-
-fun Fragment.toast(message: String, length: Int = Toast.LENGTH_SHORT) {
-    context?.toast(message, length)
+    companion object {
+        const val TOAST_TXT = "Не удалось подключиться"
+    }
 }

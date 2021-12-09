@@ -12,6 +12,7 @@ import com.example.chat.databinding.FragmentUsersBinding
 import com.example.chat.model.User
 import com.example.chat.ui.chat.ChatFragment
 import com.example.chat.ui.login.LoginFragment
+import com.example.chat.utils.Constants.TOAST_TXT_CONNECTION_LOST
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class UsersFragment : Fragment() {
@@ -23,7 +24,7 @@ class UsersFragment : Fragment() {
     private val adapter by lazy {
         UsersAdapter(
             onUsersClicked = {
-                onUsersClicked(it)
+                transitionToTheNextWindow(it)
             }
         )
     }
@@ -50,7 +51,7 @@ class UsersFragment : Fragment() {
         binding.recycler.adapter = adapter
     }
 
-    private fun onUsersClicked(user: User) {
+    private fun transitionToTheNextWindow(user: User) {
         val fragment = ChatFragment.newInstance(user)
         val fragmentTransaction = activity?.supportFragmentManager?.beginTransaction()
         fragmentTransaction?.replace(
@@ -68,20 +69,18 @@ class UsersFragment : Fragment() {
         model.errorServer.observe(viewLifecycleOwner, {
             Toast.makeText(
                 activity?.applicationContext,
-                //ресурсы
-                "Соединение с сервером потеряно",
+                TOAST_TXT_CONNECTION_LOST,
                 Toast.LENGTH_SHORT
             ).show()
-            createLoginFragment()
+            transitionToTheFirstWindow()
         })
     }
 
-    private fun createLoginFragment() {
+    private fun transitionToTheFirstWindow() {
         val fragment = LoginFragment()
         val fragmentTransaction = activity?.supportFragmentManager?.beginTransaction()
         fragmentTransaction?.replace(R.id.fragment_container, fragment)
             ?.addToBackStack("")
             ?.commit()
     }
-
 }

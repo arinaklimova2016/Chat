@@ -4,10 +4,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.chat.MessagesRepository
+import com.example.chat.data.repository.MessagesRepository
+import com.example.chat.data.room.Message
 import com.example.chat.model.User
-import com.example.chat.room.Message
-import com.example.chat.singleliveevent.SingleLiveEvent
+import com.example.chat.utils.SingleLiveEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -15,26 +15,25 @@ import kotlinx.coroutines.withContext
 
 class ChatViewModel(
     private val user: User,
-    //переименовать
-    private val map: MessagesRepository
+    private val repository: MessagesRepository
 ) : ViewModel() {
 
     private val _messages: MutableLiveData<List<Message>> = MutableLiveData()
     val messages: LiveData<List<Message>> = _messages
 
-    //спрятать в лайв дата
-    val errorServer = SingleLiveEvent<Int>()
+    private val _errorServer = SingleLiveEvent<Int>()
+    val errorServer: LiveData<Int> = _errorServer
 
     init {
         viewModelScope.launch {
-            map.getMessagesByUserId(user.id).collect {
+            repository.getMessagesByUserId(user.id).collect {
                 _messages.value = it
             }
         }
         viewModelScope.launch {
-            map.getError().collect {
+            repository.getError().collect {
                 withContext(Dispatchers.Main) {
-                    errorServer.value = it
+                    _errorServer.value = it
                 }
             }
         }
@@ -42,12 +41,12 @@ class ChatViewModel(
 
     fun sendMessage(message: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            map.sendMessage(user, message)
+            repository.sendMessage(user, message)
         }
     }
 
     fun getYou(): User {
-        return map.getYou()
+        return repository.getYou()
     }
 
 }

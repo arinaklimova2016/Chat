@@ -4,18 +4,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.chat.R
-import com.example.chat.constants.Constants.USER
 import com.example.chat.databinding.FragmentChatBinding
 import com.example.chat.model.User
 import com.example.chat.ui.login.LoginFragment
+import com.example.chat.utils.Constants.TOAST_TXT_CONNECTION_LOST
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 
@@ -25,7 +21,7 @@ class ChatFragment : Fragment() {
     private val model by viewModel<ChatViewModel>(parameters = { parametersOf(itemUser) })
 
     private val itemUser: User by lazy {
-        requireArguments().getParcelable(USER)!!
+        requireArguments().getParcelable(USERRECEIVER)!!
     }
 
     private val adapter by lazy {
@@ -34,10 +30,6 @@ class ChatFragment : Fragment() {
             you = model.getYou()
         )
     }
-
-    private lateinit var txtView: TextView
-    private lateinit var editText: EditText
-    private lateinit var btnSend: ImageView
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -53,24 +45,14 @@ class ChatFragment : Fragment() {
 
         bindingRecycler()
 
-        txtView = binding.username
-        editText = binding.editMessage
-        btnSend = binding.btnSendMessage
-        ////////////
         with(binding) {
             username.text = itemUser.name
-            btnSend.setOnClickListener {
-
+            btnSendMessage.setOnClickListener {
+                val message: String = editMessage.text.toString()
+                model.sendMessage(message)
+                editMessage.text.clear()
             }
         }
-
-        txtView.text = itemUser.name
-        btnSend.setOnClickListener {
-            val message: String = editText.text.toString()
-            model.sendMessage(message)
-            editText.text.clear()
-        }
-
         observeViewModel()
     }
 
@@ -81,14 +63,14 @@ class ChatFragment : Fragment() {
         model.errorServer.observe(viewLifecycleOwner, {
             Toast.makeText(
                 activity?.applicationContext,
-                "Соединение с сервером потеряно",
+                TOAST_TXT_CONNECTION_LOST,
                 Toast.LENGTH_SHORT
             ).show()
-            createLoginFragment()
+            transitionToTheFirstWindow()
         })
     }
 
-    private fun createLoginFragment() {
+    private fun transitionToTheFirstWindow() {
         activity?.supportFragmentManager?.popBackStack("", 0)
         val fragment = LoginFragment()
         val fragmentTransaction = activity?.supportFragmentManager?.beginTransaction()
@@ -103,13 +85,14 @@ class ChatFragment : Fragment() {
     }
 
     companion object {
+        const val USERRECEIVER = "user"
+
         fun newInstance(receiver: User): ChatFragment {
             return ChatFragment().apply {
                 arguments = Bundle().apply {
-                    putParcelable(USER, receiver)
+                    putParcelable(USERRECEIVER, receiver)
                 }
             }
         }
     }
-
 }
