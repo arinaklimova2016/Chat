@@ -4,10 +4,7 @@ import com.example.chat.model.*
 import com.example.chat.utils.Constants.DELAY
 import com.google.gson.Gson
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.*
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
@@ -19,14 +16,17 @@ class TcpClientImpl : TcpClient {
     private lateinit var socket: Socket
     private lateinit var reader: BufferedReader
     private lateinit var writer: PrintWriter
-    private lateinit var you: User
-    private lateinit var userId: ConnectedDto
+
     private var gson = Gson()
     private var timer: Job? = null
+
     private val job = SupervisorJob()
     private val scope = CoroutineScope(Dispatchers.IO + job)
     private val usersList = MutableSharedFlow<UsersReceivedDto>()
     private val newMessage = MutableStateFlow<MessageDto?>(null)
+    private val userName = MutableStateFlow<String?>(null)
+    private val userId = MutableStateFlow<ConnectedDto?>(null)
+    private val you = MutableStateFlow<User?>(null)
     private val showError = MutableSharedFlow<Int>()
 
     companion object {
@@ -40,20 +40,9 @@ class TcpClientImpl : TcpClient {
         socket.soTimeout = TIMEOUT
         reader = BufferedReader(InputStreamReader(socket.getInputStream()))
         writer = PrintWriter(OutputStreamWriter(socket.getOutputStream()))
+        userName.emit(name)
         inspector()
         gson = Gson()
-
-        you = User(userId.id, name)
-        writer.println(
-            gson.toJson(
-                BaseDto(
-                    BaseDto.Action.CONNECT,
-                    gson.toJson(ConnectDto(userId.id, name))
-                )
-            )
-        )
-        writer.flush()
-        ping()
     }
 
     private fun ping() {
@@ -65,7 +54,7 @@ class TcpClientImpl : TcpClient {
                         gson.toJson(
                             BaseDto(
                                 BaseDto.Action.PING,
-                                gson.toJson(PingDto(you.id))
+                                gson.toJson(PingDto(you.value!!.id))
                             )
                         )
                     )
@@ -89,7 +78,8 @@ class TcpClientImpl : TcpClient {
                     val baseDto = gson.fromJson(reader.readLine(), BaseDto::class.java)
                     when (baseDto.action) {
                         BaseDto.Action.CONNECTED -> {
-                            userId = gson.fromJson(baseDto.payload, ConnectedDto::class.java)
+                            userId.value = gson.fromJson(baseDto.payload, ConnectedDto::class.java)
+                            confirmConnect()
                         }
                         BaseDto.Action.PONG -> {
                             timer?.cancel()
@@ -121,15 +111,33 @@ class TcpClientImpl : TcpClient {
         }
     }
 
-    override suspend fun getUsers() {
+    private suspend fun confirmConnect() {
+        val id: String = userId.first()?.id ?: ""
+        val name = userName.first() ?: ""
+        you.emit(User(id, name))
         writer.println(
             gson.toJson(
                 BaseDto(
-                    BaseDto.Action.GET_USERS,
-                    gson.toJson(GetUsersDto(you.id))
+                    BaseDto.Action.CONNECT,
+                    gson.toJson(ConnectDto(userId.value!!.id, userName.value!!))
                 )
             )
         )
+        writer.flush()
+        ping()
+    }
+
+    override suspend fun getUsers() {
+        val userId = you.first()?.id ?: ""
+        val getUsers = gson.toJson(
+            BaseDto(
+                BaseDto.Action.GET_USERS,
+                gson.toJson(
+                    GetUsersDto(userId)
+                )
+            )
+        )
+        writer.println(getUsers)
         writer.flush()
     }
 
@@ -138,14 +146,19 @@ class TcpClientImpl : TcpClient {
     }
 
     override suspend fun sendMessage(receiver: String, message: String) {
-        writer.println(
-            gson.toJson(
-                BaseDto(
-                    BaseDto.Action.SEND_MESSAGE,
-                    gson.toJson(SendMessageDto(you.id, receiver, message))
+        val sendMessage = gson.toJson(
+            BaseDto(
+                BaseDto.Action.SEND_MESSAGE,
+                gson.toJson(
+                    SendMessageDto(
+                        you.value!!.id,
+                        receiver,
+                        message
+                    )
                 )
             )
         )
+        writer.println(sendMessage)
         writer.flush()
     }
 
@@ -158,7 +171,7 @@ class TcpClientImpl : TcpClient {
     }
 
     override fun getYou(): User {
-        return you
+        return you.value!!
     }
 
     private fun close() {
