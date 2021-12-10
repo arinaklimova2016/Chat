@@ -19,7 +19,9 @@ class UsersViewModel(
 
     private val _users: MutableLiveData<List<User>> = MutableLiveData()
     val users: LiveData<List<User>> = _users
-    val errorServer = SingleLiveEvent<Int>()
+
+    private val _errorServer = SingleLiveEvent<Int>()
+    val errorServer: LiveData<Int> = _errorServer
 
     init {
         observer()
@@ -40,7 +42,7 @@ class UsersViewModel(
             val showError = tcp.getError()
             showError.collect {
                 withContext(Dispatchers.Main) {
-                    errorServer.value = it
+                    _errorServer.value = it
                 }
             }
 

@@ -17,8 +17,8 @@ class ChatAdapter(
 ) : ListAdapter<Message, ChatAdapter.BaseViewHolder>(DiffCallback()) {
 
     companion object {
-        const val SENDMESSAGE = 0
-        const val RECEIVEMESSAGE = 1
+        private const val SENDMESSAGE = 0
+        private const val RECEIVEMESSAGE = 1
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {

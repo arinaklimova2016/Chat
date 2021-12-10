@@ -85,7 +85,7 @@ class ChatFragment : Fragment() {
     }
 
     companion object {
-        const val USERRECEIVER = "user"
+        private const val USERRECEIVER = "user"
 
         fun newInstance(receiver: User): ChatFragment {
             return ChatFragment().apply {

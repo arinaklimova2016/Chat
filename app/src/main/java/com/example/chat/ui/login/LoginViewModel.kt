@@ -1,5 +1,6 @@
 package com.example.chat.ui.login
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.chat.data.server.TcpClient
@@ -14,8 +15,11 @@ class LoginViewModel(
     private val tcp: TcpClient
 ) : ViewModel() {
 
-    val listenerId = SingleLiveEvent<Unit>()
-    val listenerError = SingleLiveEvent<Unit>()
+    private val _triggerNextNavigation = SingleLiveEvent<Unit>()
+    val triggerNextNavigation: LiveData<Unit> = _triggerNextNavigation
+
+    private val _errorServer = SingleLiveEvent<Unit>()
+    val errorServer: LiveData<Unit> = _errorServer
 
     fun getIp(name: String) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -23,12 +27,12 @@ class LoginViewModel(
                 val ip = udp.getServerIp()
                 tcp.createSocket(ip, name)
                 withContext(Dispatchers.Main) {
-                    listenerId.call()
+                    _triggerNextNavigation.call()
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
                 withContext(Dispatchers.Main) {
-                    listenerError.call()
+                    _errorServer.call()
                 }
             }
         }

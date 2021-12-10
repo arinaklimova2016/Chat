@@ -51,10 +51,10 @@ class LoginFragment : Fragment() {
     }
 
     private fun observeToViewModel() {
-        model.listenerId.observe(this, {
+        model.triggerNextNavigation.observe(this, {
             transitionToTheNextWindow()
         })
-        model.listenerError.observe(this, {
+        model.errorServer.observe(this, {
             binding.progressBar.visibility = ProgressBar.INVISIBLE
             Toast.makeText(
                 activity?.applicationContext,
@@ -70,6 +70,6 @@ class LoginFragment : Fragment() {
     }
 
     companion object {
-        const val TOAST_TXT = "Не удалось подключиться"
+        private const val TOAST_TXT = "Не удалось подключиться"
     }
 }

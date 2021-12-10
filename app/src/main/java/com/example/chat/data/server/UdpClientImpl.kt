@@ -11,11 +11,11 @@ import java.nio.channels.NoConnectionPendingException
 class UdpClientImpl : UdpClient {
 
     companion object {
-        const val HOST = "255.255.255.255"
-        const val MESSAGE = "Hello World"
-        const val COUNT = 20
-        const val BYTEARRAYSIZE = 256
-        const val UPD_PORT = 8888
+        private const val HOST = "255.255.255.255"
+        private const val MESSAGE = "Hello World"
+        private const val COUNT = 20
+        private const val BYTEARRAYSIZE = 256
+        private const val UPD_PORT = 8888
     }
 
     override suspend fun getServerIp(): String {
