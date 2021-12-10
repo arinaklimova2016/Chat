@@ -6,10 +6,10 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.chat.data.room.Message
 import com.example.chat.databinding.ReceiveMessageBinding
 import com.example.chat.databinding.SendMessageBinding
-import com.example.chat.model.User
+import com.example.domain.data.room.Message
+import com.example.domain.model.User
 
 class ChatAdapter(
     private val receiver: User,

@@ -9,7 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.chat.R
 import com.example.chat.databinding.FragmentChatBinding
-import com.example.chat.model.User
+import com.example.domain.model.User
 import com.example.chat.ui.login.LoginFragment
 import com.example.chat.utils.Constants.TOAST_TXT_CONNECTION_LOST
 import org.koin.androidx.viewmodel.ext.android.viewModel

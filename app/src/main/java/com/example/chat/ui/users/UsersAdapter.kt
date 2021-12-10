@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.chat.databinding.UserLayoutBinding
-import com.example.chat.model.User
+import com.example.domain.model.User
 
 class UsersAdapter(
     private val onUsersClicked: (User) -> Unit

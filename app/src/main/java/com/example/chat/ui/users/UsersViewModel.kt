@@ -4,9 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.chat.data.server.TcpClient
-import com.example.chat.model.User
+import com.example.domain.model.User
 import com.example.chat.utils.SingleLiveEvent
+import com.example.domain.data.server.TcpClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect

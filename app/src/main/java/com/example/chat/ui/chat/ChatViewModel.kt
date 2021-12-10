@@ -4,18 +4,17 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.chat.data.repository.MessagesRepository
-import com.example.chat.data.room.Message
-import com.example.chat.model.User
+import com.example.domain.model.User
 import com.example.chat.utils.SingleLiveEvent
+import com.example.domain.repository.MessagesRepository
+import com.example.domain.data.room.Message
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class ChatViewModel(
     private val user: User,
-    private val repository: MessagesRepository
+    private val repository: com.example.domain.repository.MessagesRepository
 ) : ViewModel() {
 
     private val _messages: MutableLiveData<List<Message>> = MutableLiveData()

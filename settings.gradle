@@ -8,3 +8,5 @@ dependencyResolutionManagement {
 }
 rootProject.name = "Chat"
 include ':app'
+include ':data'
+include ':domain'

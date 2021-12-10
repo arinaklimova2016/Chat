@@ -1,19 +1,18 @@
 package com.example.chat.di
 
 import androidx.room.Room
-import com.example.chat.data.repository.MessagesRepository
-import com.example.chat.data.repository.MessagesRepositoryImpl
-import com.example.chat.data.room.ChatDatabase
-import com.example.chat.data.server.TcpClient
-import com.example.chat.data.server.TcpClientImpl
-import com.example.chat.data.server.UdpClient
-import com.example.chat.data.server.UdpClientImpl
+import com.example.data.data.localrepo.LocalRepositoryImpl
+import com.example.data.data.room.ChatDatabase
+import com.example.data.data.server.TcpClientImpl
+import com.example.data.data.server.UdpClient
+import com.example.data.data.server.UdpClientImpl
+import com.example.domain.repository.MessagesRepository
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 
 val dataModule = module {
     single<MessagesRepository> {
-        MessagesRepositoryImpl(tcp = get(), messageDao = get())
+        com.example.domain.repository.MessagesRepositoryImpl(tcp = get(), localRepository = get())
     }
 
     factory {
@@ -30,6 +29,10 @@ val dataModule = module {
 
     single<UdpClient> {
         UdpClientImpl()
+    }
+
+    single<LocalRepository> {
+        LocalRepositoryImpl(get())
     }
 
     factory {
