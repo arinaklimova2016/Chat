@@ -53,7 +53,7 @@ class TcpClientImpl : TcpClient {
                     val ping = PingDto(
                         you.value!!.id
                     ).toJson()
-                    writing(ping)
+                    send(ping)
                     timer = scope.launch {
                         delay(DELAY)
                         close()
@@ -111,10 +111,10 @@ class TcpClientImpl : TcpClient {
         val name = userName.first() ?: ""
         you.emit(User(id, name))
         val connect = ConnectDto(
-            userId.value!!.id,
-            userName.value!!
+            id = id,
+            name = name
         ).toJson()
-        writing(connect)
+        send(connect)
         ping()
     }
 
@@ -123,7 +123,7 @@ class TcpClientImpl : TcpClient {
         val getUsers = GetUsersDto(
             userId
         ).toJson()
-        writing(getUsers)
+        send(getUsers)
     }
 
     override fun getUsersList(): Flow<UsersReceivedDto> {
@@ -136,7 +136,7 @@ class TcpClientImpl : TcpClient {
             receiver,
             message
         ).toJson()
-        writing(sendMessage)
+        send(sendMessage)
     }
 
     override fun getNewMessage(): Flow<MessageDto> {
@@ -151,7 +151,7 @@ class TcpClientImpl : TcpClient {
         return you.value!!
     }
 
-    private fun writing(message: String) {
+    private fun send(message: String) {
         writer.println(message)
         writer.flush()
     }
