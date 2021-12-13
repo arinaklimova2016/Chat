@@ -14,7 +14,15 @@ data class Message(
     val message: String
 )
 
-fun Message.toDatabase(): DomainMessage {
+fun DomainMessage.toDatabase(): Message {
+    return Message(
+        from = from,
+        to = to,
+        message = message
+    )
+}
+
+fun Message.toDomain(): DomainMessage {
     return DomainMessage(
         from = from,
         to = to,
