@@ -10,7 +10,6 @@ import com.example.chat.model.toUser
 import com.example.chat.utils.SingleLiveEvent
 import com.example.data.data.room.Message
 import com.example.data.data.room.toDatabase
-import com.example.domain.model.User
 import com.example.domain.repository.MessagesRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect

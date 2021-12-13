@@ -11,9 +11,9 @@ import com.example.chat.R
 import com.example.chat.databinding.FragmentChatBinding
 import com.example.chat.model.UiUser
 import com.example.chat.model.toUi
-import com.example.domain.model.User
 import com.example.chat.ui.login.LoginFragment
 import com.example.chat.utils.Constants.TOAST_TXT_CONNECTION_LOST
+import com.example.domain.model.User
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 

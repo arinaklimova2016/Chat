@@ -2,6 +2,7 @@ package com.example.domain.repository
 
 import com.example.domain.model.DomainMessage
 import com.example.domain.model.User
+import com.example.domain.repository.generate.IdGenerator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -12,7 +13,8 @@ import kotlinx.coroutines.launch
 
 class MessagesRepositoryImpl(
     private val tcp: TcpClient,
-    private val localRepository: LocalRepository
+    private val localRepository: LocalRepository,
+    private val idGenerator: IdGenerator
 ) : MessagesRepository {
 
     private val message = tcp.getNewMessage()
@@ -29,6 +31,7 @@ class MessagesRepositoryImpl(
             message.collect {
                 localRepository.addMessage(
                     message = DomainMessage(
+                        id = idGenerator.generateId(),
                         from = it.from.id,
                         to = you.id,
                         message = it.message
@@ -50,7 +53,12 @@ class MessagesRepositoryImpl(
 
     override suspend fun sendMessage(user: User, message: String) {
         tcp.sendMessage(user.id, message)
-        val newMessage = DomainMessage(from = you.id, to = user.id, message = message)
+        val newMessage = DomainMessage(
+            id = idGenerator.generateId(),
+            from = you.id,
+            to = user.id,
+            message = message
+        )
         localRepository.addMessage(newMessage)
     }
 
@@ -61,5 +69,4 @@ class MessagesRepositoryImpl(
     override fun getError(): Flow<Int> {
         return errorListener
     }
-
 }

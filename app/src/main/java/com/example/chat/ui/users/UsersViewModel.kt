@@ -4,8 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.chat.model.UiUser
-import com.example.chat.model.toUi
 import com.example.chat.utils.SingleLiveEvent
 import com.example.domain.model.User
 import com.example.domain.repository.TcpClient
@@ -33,7 +31,7 @@ class UsersViewModel(
     fun getUsers() {
         viewModelScope.launch(Dispatchers.IO) {
             while (true) {
-                delay(1000)
+                delay(DELAY)
                 tcp.getUsers()
             }
         }
@@ -55,5 +53,9 @@ class UsersViewModel(
                 _users.value = it.users
             }
         }
+    }
+
+    companion object {
+        private const val DELAY: Long = 1000
     }
 }

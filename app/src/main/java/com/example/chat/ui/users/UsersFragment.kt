@@ -9,8 +9,6 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.chat.R
 import com.example.chat.databinding.FragmentUsersBinding
-import com.example.chat.model.UiUser
-import com.example.chat.model.toUi
 import com.example.chat.ui.chat.ChatFragment
 import com.example.chat.ui.login.LoginFragment
 import com.example.chat.utils.Constants.TOAST_TXT_CONNECTION_LOST

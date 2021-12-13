@@ -1,6 +1,5 @@
 package com.example.data.data.localrepo
 
-import com.example.data.data.room.Message
 import com.example.data.data.room.MessageDao
 import com.example.data.data.room.toDatabase
 import com.example.data.data.room.toDomain
@@ -11,7 +10,7 @@ import kotlinx.coroutines.flow.map
 
 class LocalRepositoryImpl(
     private val messageDao: MessageDao
-): LocalRepository {
+) : LocalRepository {
     override fun getMessageById(id: String): Flow<List<DomainMessage>> {
         return messageDao.getById(id).map {
             it.map {

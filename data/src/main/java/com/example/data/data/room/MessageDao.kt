@@ -3,7 +3,6 @@ package com.example.data.data.room
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
-import com.example.domain.model.DomainMessage
 import kotlinx.coroutines.flow.Flow
 
 @Dao
