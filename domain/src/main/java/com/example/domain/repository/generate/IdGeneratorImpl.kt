@@ -1,13 +1,11 @@
 package com.example.domain.repository.generate
 
-class IdGeneratorImpl : IdGenerator {
-
-    private val idChars = ID_CHARS
+internal class IdGeneratorImpl : IdGenerator {
 
     override fun generateId(length: Int): String {
         return buildString {
             repeat(length) {
-                append(idChars.random())
+                append(ID_CHARS.random())
             }
         }
     }

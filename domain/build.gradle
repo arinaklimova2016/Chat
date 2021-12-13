@@ -17,4 +17,9 @@ dependencies {
     //Gson
     implementation 'com.google.code.gson:gson:2.8.9'
 
+    //Koin
+    implementation "org.koin:koin-core:2.0.1"
+    implementation "org.koin:koin-android:2.0.1"
+    implementation "org.koin:koin-androidx-viewmodel:2.0.1"
+
 }

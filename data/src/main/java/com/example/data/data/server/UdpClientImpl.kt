@@ -8,7 +8,7 @@ import java.net.InetAddress
 import java.net.SocketException
 import java.nio.channels.NoConnectionPendingException
 
-class UdpClientImpl : UdpClient {
+internal class UdpClientImpl : UdpClient {
 
     companion object {
         private const val HOST = "255.255.255.255"

@@ -12,7 +12,7 @@ import java.io.OutputStreamWriter
 import java.io.PrintWriter
 import java.net.Socket
 
-class TcpClientImpl : TcpClient {
+internal class TcpClientImpl : TcpClient {
 
     private lateinit var socket: Socket
     private lateinit var reader: BufferedReader

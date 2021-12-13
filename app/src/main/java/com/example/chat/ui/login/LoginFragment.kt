@@ -64,11 +64,6 @@ class LoginFragment : Fragment() {
         })
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        activity?.finish()
-    }
-
     companion object {
         private const val TOAST_TXT = "Не удалось подключиться"
     }

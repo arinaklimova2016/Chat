@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
-class MessagesRepositoryImpl(
+internal class MessagesRepositoryImpl(
     private val tcp: TcpClient,
     private val localRepository: LocalRepository,
     private val idGenerator: IdGenerator
