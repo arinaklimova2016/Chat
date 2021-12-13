@@ -4,17 +4,22 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.domain.model.User
+import com.example.chat.model.UiUser
+import com.example.chat.model.toUi
+import com.example.chat.model.toUser
 import com.example.chat.utils.SingleLiveEvent
+import com.example.data.data.room.Message
+import com.example.data.data.room.toDatabase
+import com.example.domain.model.User
 import com.example.domain.repository.MessagesRepository
-import com.example.domain.data.room.Message
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class ChatViewModel(
-    private val user: User,
-    private val repository: com.example.domain.repository.MessagesRepository
+    private val user: UiUser,
+    private val repository: MessagesRepository
 ) : ViewModel() {
 
     private val _messages: MutableLiveData<List<Message>> = MutableLiveData()
@@ -26,7 +31,9 @@ class ChatViewModel(
     init {
         viewModelScope.launch {
             repository.getMessagesByUserId(user.id).collect {
-                _messages.value = it
+                _messages.value = it.map {
+                    it.toDatabase()
+                }
             }
         }
         viewModelScope.launch {
@@ -40,12 +47,12 @@ class ChatViewModel(
 
     fun sendMessage(message: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.sendMessage(user, message)
+            repository.sendMessage(user.toUser(), message)
         }
     }
 
-    fun getYou(): User {
-        return repository.getYou()
+    fun getYou(): UiUser {
+        return repository.getYou().toUi()
     }
 
 }

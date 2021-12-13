@@ -9,6 +9,8 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.chat.R
 import com.example.chat.databinding.FragmentChatBinding
+import com.example.chat.model.UiUser
+import com.example.chat.model.toUi
 import com.example.domain.model.User
 import com.example.chat.ui.login.LoginFragment
 import com.example.chat.utils.Constants.TOAST_TXT_CONNECTION_LOST
@@ -20,7 +22,7 @@ class ChatFragment : Fragment() {
     private lateinit var binding: FragmentChatBinding
     private val model by viewModel<ChatViewModel>(parameters = { parametersOf(itemUser) })
 
-    private val itemUser: User by lazy {
+    private val itemUser: UiUser by lazy {
         requireArguments().getParcelable(USERRECEIVER)!!
     }
 
@@ -90,7 +92,7 @@ class ChatFragment : Fragment() {
         fun newInstance(receiver: User): ChatFragment {
             return ChatFragment().apply {
                 arguments = Bundle().apply {
-                    putParcelable(USERRECEIVER, receiver)
+                    putParcelable(USERRECEIVER, receiver.toUi())
                 }
             }
         }

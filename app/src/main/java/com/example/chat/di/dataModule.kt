@@ -6,7 +6,9 @@ import com.example.data.data.room.ChatDatabase
 import com.example.data.data.server.TcpClientImpl
 import com.example.data.data.server.UdpClient
 import com.example.data.data.server.UdpClientImpl
+import com.example.domain.repository.LocalRepository
 import com.example.domain.repository.MessagesRepository
+import com.example.domain.repository.TcpClient
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 

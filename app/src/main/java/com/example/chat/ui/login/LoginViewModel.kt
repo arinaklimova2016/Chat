@@ -4,8 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.chat.utils.SingleLiveEvent
-import com.example.domain.data.server.TcpClient
-import com.example.domain.data.server.UdpClient
+import com.example.data.data.server.UdpClient
+import com.example.domain.repository.TcpClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

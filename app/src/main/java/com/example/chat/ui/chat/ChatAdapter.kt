@@ -8,12 +8,12 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.chat.databinding.ReceiveMessageBinding
 import com.example.chat.databinding.SendMessageBinding
-import com.example.domain.data.room.Message
-import com.example.domain.model.User
+import com.example.chat.model.UiUser
+import com.example.data.data.room.Message
 
 class ChatAdapter(
-    private val receiver: User,
-    private val you: User
+    private val receiver: UiUser,
+    private val you: UiUser
 ) : ListAdapter<Message, ChatAdapter.BaseViewHolder>(DiffCallback()) {
 
     companion object {
@@ -55,14 +55,14 @@ class ChatAdapter(
     }
 
     abstract class BaseViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        abstract fun bind(message: Message, user: User)
+        abstract fun bind(message: Message, user: UiUser)
     }
 
     class SendViewHolder(
         private val binding: SendMessageBinding
     ) : BaseViewHolder(binding.root) {
 
-        override fun bind(message: Message, user: User) {
+        override fun bind(message: Message, user: UiUser) {
             with(binding) {
                 txtSendMessage.text = message.message
                 txtUsername.text = user.name
@@ -74,7 +74,7 @@ class ChatAdapter(
         private val binding: ReceiveMessageBinding
     ) : BaseViewHolder(binding.root) {
 
-        override fun bind(message: Message, user: User) {
+        override fun bind(message: Message, user: UiUser) {
             with(binding) {
                 txtReceiveMessage.text = message.message
                 txtUsername.text = user.name
